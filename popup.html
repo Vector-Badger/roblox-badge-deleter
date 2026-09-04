@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 8px;">
+      <img src="icon128.png" alt="Logo" style="width: 56px; height: 56px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));">
+    </div>
+    <h2 style="margin-top: 0;">Badge Deleter</h2>
+    
+    <div id="step-load">
+      <p>Gather your entire inventory to begin.</p>
+      <button id="loadBtn">Load Inventory</button>
+    </div>
+
+    <div id="step-filter" style="display: none;">
+      <p id="inventoryStats">Badges loaded: 0</p>
+      <input type="text" id="phraseFilter" placeholder="Target phrase (leave empty for ALL)">
+      
+      <div class="input-wrapper">
+        <input type="text" id="whitelistFilter" placeholder="Whitelist phrase (e.g. 'Rare')">
+        <span class="info-icon" title="Badges matching this phrase will be automatically unchecked and protected from deletion.">i</span>
+      </div>
+      
+      <div id="badgeList" class="scrollable-list">
+        <!-- Badge items will be injected here -->
+      </div>
+
+      <div class="match-stats">
+        <span id="matchCount">0 selected</span>
+      </div>
+      <button id="deleteBtn" class="danger" disabled>Delete Selected</button>
+    </div>
+
+    <div id="step-confirm" style="display: none;">
+      <p class="warning-text">Are you sure you want to permanently delete <span id="confirmCount"></span> badges?</p>
+      <p style="color: #F68888; font-size: 11px; text-align: center; margin-top: 0;">(Do NOT close this window until complete!)</p>
+      <div class="button-group">
+        <button id="cancelDeleteBtn" class="secondary">Cancel</button>
+        <button id="confirmDeleteBtn" class="danger">&#10006;</button>
+      </div>
+    </div>
+
+
+
+    <div id="status"></div>
+
+    <div class="footer" style="display: flex; justify-content: center; gap: 8px; font-size: 12px; color: #888;">
+      <a href="mailto:delbadger.dev@gmail.com?subject=Badge%20Deleter%20Support" id="feedbackLink" style="color: #BDBEBE; text-decoration: none;">Feedback</a>
+      <span>&bull;</span>
+      <a href="#" id="popOutLink" title="Open in a dedicated tab to run safely in the background!" style="color: #BDBEBE; text-decoration: none;">Pop Out Tab <span style="cursor:help" title="Pop out into a full tab to run in the background safely!">(?)</span></a>
+      <span>&bull;</span>
+      <a href="https://ko-fi.com/badgerdev" id="donateLink" target="_blank" title="Support the developer" style="color: #BDBEBE; text-decoration: none;">Donate</a>
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
