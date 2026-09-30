@@ -1,0 +1,9 @@
+# Developer Files
+node_modules/
+.env
+.env.*
+*.zip
+
+# OS Files
+.DS_Store
+Thumbs.db
