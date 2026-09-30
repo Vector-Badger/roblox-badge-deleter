@@ -132,16 +132,8 @@ const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
 const popOutLink = document.getElementById('popOutLink');
 if (popOutLink) {
-  // If we are already in a full tab, hide the pop out link
-  if (window.innerWidth > 400) {
-    popOutLink.style.display = 'none';
-    popOutLink.previousElementSibling.style.display = 'none'; // hide the dot before it
-  } else {
-    popOutLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      chrome.tabs.create({ url: chrome.runtime.getURL("popup.html") });
-    });
-  }
+  popOutLink.style.display = 'none'; // Completely hidden in v1.42
+  popOutLink.previousElementSibling.style.display = 'none'; // hide the dot
 }
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -166,77 +158,20 @@ cancelDeleteBtn.addEventListener('click', () => {
   setStatus('');
 });
 
-confirmDeleteBtn.addEventListener('click', async () => {
+confirmDeleteBtn.addEventListener('click', () => {
   const toDelete = badgesToDeleteCache;
   if (toDelete.length === 0) return;
 
   cancelDeleteBtn.disabled = true;
   confirmDeleteBtn.disabled = true;
   
-  let successCount = 0;
-  let failCount = 0;
+  const badgeIds = toDelete.map(item => item.badge.id);
 
-  for (let i = 0; i < toDelete.length; i++) {
-    const badge = toDelete[i].badge;
-    setStatus(`Deleting (${i + 1}/${toDelete.length}): ${badge.name}...`, '#BDBEBE');
-    
-    let retries = 0;
-    let deleted = false;
-    
-    while (retries < 3 && !deleted) {
-      try {
-        const response = await new Promise((resolve) => {
-          chrome.runtime.sendMessage({ action: 'delete_badge', badgeId: badge.id }, (res) => {
-            resolve(res);
-          });
-        });
+  chrome.runtime.sendMessage({ action: 'start_mass_deletion', badgesToDelete: badgeIds });
 
-        if (response && response.success) {
-          successCount++;
-          deleted = true;
-        } else {
-          if (response && response.status === 429) {
-            setStatus(`Rate limited. Waiting to retry ${badge.name}...`, '#F68888');
-            await sleep(3000); // wait 3s on rate limit
-            retries++;
-          } else {
-            failCount++;
-            console.error(`Failed to delete badge ${badge.id}:`, response?.error);
-            break; // don't retry on normal errors
-          }
-        }
-      } catch (e) {
-        failCount++;
-        break;
-      }
-    }
-    
-    if (retries >= 3 && !deleted) failCount++;
-    await sleep(400); // baseline delay increased slightly to avoid 429s in the first place
-  }
-
-  setStatus(`Deletion complete. ${successCount} deleted, ${failCount} failed. (Refresh page to see changes!)`, '#00B06F');
+  setStatus(`Deletion started! You can safely close this popup—the process will finish automatically in the background.`, '#00B06F');
   
-  if (window.innerWidth > 400) {
-    // If running in background tab, auto-close it when done!
-    await sleep(3000);
-    window.close();
-    return;
-  }
-  
-  // Reset UI
-  allBadges = [];
-  matchedBadges = [];
+  // Clean up UI so they know it's handled
   badgeListContainer.innerHTML = '';
-  phraseFilter.value = '';
-  whitelistFilter.value = '';
-  updateSelectionCount();
-  
   stepConfirm.style.display = 'none';
-  stepLoad.style.display = 'flex';
-  loadBtn.disabled = false;
-  phraseFilter.disabled = false;
-  whitelistFilter.disabled = false;
-  cancelDeleteBtn.disabled = false;
-  confirmDeleteBtn.disabled = false;
 });
