@@ -20,3 +20,16 @@ Available on the Chrome Web Store! (Link coming soon)
 ## Support
 If you find this tool useful, consider supporting the developer:
 [Buy me a coffee on Ko-fi](https://ko-fi.com/badgerdev)
+
+## 🛠️ For Developers & Contributors (Automated Deployment)
+
+**Warning for mortals:** This repository uses a highly automated deployment pipeline. 
+If you are contributing to this project and wish to build the cross-browser `.zip` files, simply ensure you have Node.js installed and run:
+
+```bash
+npm install
+npm run build
+```
+This will automatically strip developer files, mutate the `manifest.json` for Firefox compatibility, and output both `ChromeBadgeDeleter.zip` and `FirefoxBadgeDeleter.zip` in the parent directory.
+
+*Note: The `npm run deploy` command requires a configured `.env` file with Google and Mozilla API keys and is strictly for the repository owner.*
