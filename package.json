@@ -1,6 +1,6 @@
 {
   "name": "roblox-badge-deleter",
-  "version": "1.43.0",
+  "version": "1.43.1",
   "description": "Background Badge Deleter for Roblox",
   "scripts": {
     "test": "node test.js",

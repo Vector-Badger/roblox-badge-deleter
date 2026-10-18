@@ -161,6 +161,26 @@ cancelDeleteBtn.addEventListener('click', () => {
   setStatus('');
 });
 
+function pollDeletionStatus() {
+  if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.sendMessage) return;
+  chrome.runtime.sendMessage({ action: 'get_deletion_status' }, (st) => {
+    if (chrome.runtime.lastError || !st) return;
+    if (st.active) {
+      setStatus(`Deleting in background: ${st.deleted}/${st.total} deleted (${st.failed} failed)... Safe to close popup!`, '#00B06F');
+      setTimeout(pollDeletionStatus, 500);
+    } else if (st.total > 0) {
+      if (st.deleted === 0 && st.failed > 0) {
+        setStatus(`Deletion failed (${st.failed}/${st.total}). Error: ${st.lastError || 'Check site access permissions in chrome://extensions'}`, '#F68802');
+      } else {
+        setStatus(`Deletion complete! ${st.deleted} deleted, ${st.failed} failed. (Refresh Roblox page to see changes!)`, '#00B06F');
+      }
+    }
+  });
+}
+
+// Check if a background deletion is already running when popup opens
+pollDeletionStatus();
+
 confirmDeleteBtn.addEventListener('click', () => {
   const toDelete = badgesToDeleteCache;
   if (toDelete.length === 0) return;
@@ -174,11 +194,16 @@ confirmDeleteBtn.addEventListener('click', () => {
   chrome.runtime.sendMessage({ action: 'start_mass_deletion', badgesToDelete: badgeIds }, (res) => {
     if (chrome.runtime.lastError) return;
     if (res && res.status === 'completed') {
-      setStatus(`Deletion complete! ${res.deleted} deleted, ${res.failed} failed. (Refresh Roblox page to see changes!)`, '#00B06F');
+      if (res.deleted === 0 && res.failed > 0) {
+        setStatus(`Deletion failed (${res.failed} failed). Error: ${res.lastError || 'Ensure site access is ON for *.roblox.com'}`, '#F68802');
+      } else {
+        setStatus(`Deletion complete! ${res.deleted} deleted, ${res.failed} failed. (Refresh Roblox page to see changes!)`, '#00B06F');
+      }
     }
   });
 
-  setStatus(`Deletion started! You can safely close this popup, the process will finish automatically in the background.`, '#00B06F');
+  setStatus(`Deletion started (0/${badgeIds.length})! Watch the extension icon badge or close this popup safely.`, '#00B06F');
+  setTimeout(pollDeletionStatus, 400);
   
   // Clean up UI so they know it's handled
   badgeListContainer.innerHTML = '';
