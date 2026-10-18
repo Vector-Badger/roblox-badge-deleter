@@ -184,3 +184,17 @@ confirmDeleteBtn.addEventListener('click', () => {
   badgeListContainer.innerHTML = '';
   stepConfirm.style.display = 'none';
 });
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    matchesQuery,
+    applyFilters,
+    getAllBadges: () => allBadges,
+    setAllBadges: (b) => { allBadges = b; },
+    getMatchedBadges: () => matchedBadges,
+    getSelectedCount: () => selectedCount,
+    setPhraseFilter: (v) => { phraseFilter.value = v; },
+    setWhitelistFilter: (v) => { whitelistFilter.value = v; },
+    renderBadgeList
+  };
+}
