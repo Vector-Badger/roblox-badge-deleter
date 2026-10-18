@@ -9,6 +9,7 @@ async function getCsrfToken() {
     try {
       const response = await fetch('https://auth.roblox.com/v2/logout', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Length': '0' }
       });
       const csrfToken = response.headers.get('x-csrf-token');
@@ -33,8 +34,10 @@ async function deleteBadge(badgeId) {
     csrfToken = await getCsrfToken();
   }
   
-  let response = await fetch(`https://badges.roblox.com/v1/user/badges/${badgeId}`, {
+  const safeBadgeId = encodeURIComponent(badgeId);
+  let response = await fetch(`https://badges.roblox.com/v1/user/badges/${safeBadgeId}`, {
     method: 'DELETE',
+    credentials: 'include',
     headers: {
       'x-csrf-token': csrfToken
     }
@@ -44,8 +47,9 @@ async function deleteBadge(badgeId) {
     csrfToken = response.headers.get('x-csrf-token');
     cachedCsrfToken = csrfToken; 
     
-    response = await fetch(`https://badges.roblox.com/v1/user/badges/${badgeId}`, {
+    response = await fetch(`https://badges.roblox.com/v1/user/badges/${safeBadgeId}`, {
       method: 'DELETE',
+      credentials: 'include',
       headers: {
         'x-csrf-token': csrfToken
       }
@@ -61,13 +65,17 @@ async function deleteBadge(badgeId) {
       if (data.errors && data.errors.length > 0) {
         errorMsg = data.errors[0].message;
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn("Could not parse error JSON:", e);
+    }
     return { success: false, error: errorMsg, status: response.status };
   }
 }
 
 async function getUserId() {
-  const response = await fetch('https://users.roblox.com/v1/users/authenticated');
+  const response = await fetch('https://users.roblox.com/v1/users/authenticated', {
+    credentials: 'include'
+  });
   if (!response.ok) throw new Error("Not logged in to Roblox.");
   const data = await response.json();
   return data.id;
@@ -80,15 +88,15 @@ async function fetchAllBadges() {
     let cursor = "";
     
     do {
-      let url = `https://badges.roblox.com/v1/users/${userId}/badges?limit=100&sortOrder=Desc`;
-      if (cursor) url += `&cursor=${cursor}`;
+      let url = `https://badges.roblox.com/v1/users/${encodeURIComponent(userId)}/badges?limit=100&sortOrder=Desc`;
+      if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, { credentials: 'include' });
       if (!response.ok) throw new Error(`HTTP Error ${response.status} fetching badges`);
       
       const data = await response.json();
       if (data.data) {
-        allBadges = allBadges.concat(data.data);
+        allBadges.push(...data.data);
       }
       cursor = data.nextPageCursor;
     } while (cursor);
@@ -111,13 +119,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true;
   } else if (message.action === 'start_mass_deletion') {
-    sendResponse({ status: 'started' });
-    runMassDeletion(message.badgesToDelete);
+    runMassDeletion(message.badgesToDelete)
+      .then(result => {
+        try { sendResponse(result); } catch (e) {}
+      })
+      .catch(error => {
+        try { sendResponse({ status: 'error', error: error.message }); } catch (e) {}
+      });
     return true;
+  } else if (message.action === 'track_analytics') {
+    trackAnalyticsEvent(message.eventName, message.params);
+    sendResponse({ success: true });
+    return false;
   }
 });
 
 async function runMassDeletion(badgesToProcess) {
+  if (!Array.isArray(badgesToProcess) || badgesToProcess.length === 0) {
+    return { status: 'completed', deleted: 0, failed: 0 };
+  }
+
+  // Pre-warm CSRF token before spawning workers
+  try {
+    await getCsrfToken();
+  } catch (e) {
+    console.error("Initial CSRF token fetch failed:", e);
+  }
+
   const CONCURRENCY = 5;
   let currentIndex = 0;
   let successCount = 0;
@@ -146,10 +174,12 @@ async function runMassDeletion(badgesToProcess) {
             await new Promise(r => setTimeout(r, 3000));
             retries++;
           } else {
+            console.error(`Failed deleting badge ${badgeId}:`, res.error);
             failCount++;
             break;
           }
         } catch (e) {
+          console.error(`Exception deleting badge ${badgeId}:`, e);
           failCount++;
           break;
         }
@@ -162,17 +192,17 @@ async function runMassDeletion(badgesToProcess) {
   const workerCount = Math.min(CONCURRENCY, badgesToProcess.length);
   await Promise.all(Array.from({ length: workerCount }, () => worker()));
 
-  // Send Google Analytics event!
-  if (successCount > 0) {
-    trackAnalyticsEvent('mass_deletion_success', { count: successCount, failed: failCount });
+  if (successCount > 0 || failCount > 0) {
+    trackAnalyticsEvent('mass_deletion_complete', { count: successCount, failed: failCount });
   }
+  return { status: 'completed', deleted: successCount, failed: failCount };
 }
 
 function trackAnalyticsEvent(eventName, params) {
   // Measurement Protocol for GA4
   // TODO: Replace with your actual Measurement ID and API Secret
-  const measurement_id = 'G-XXXXXXXXXX'; 
-  const api_secret = 'YOUR_API_SECRET'; 
+  const measurement_id = 'G-JKKP6G713X'; 
+  const api_secret = '9W7muFwuReyr9HcMo-GI8A'; 
   
   // If not configured, just return silently
   if (measurement_id === 'G-XXXXXXXXXX') return;

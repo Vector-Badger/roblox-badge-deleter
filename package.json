@@ -1,0 +1,15 @@
+{
+  "name": "roblox-badge-deleter",
+  "version": "1.43.0",
+  "description": "Background Badge Deleter for Roblox",
+  "scripts": {
+    "build": "rm -f ../ChromeBadgeDeleter.zip ../FirefoxBadgeDeleter.zip && rm -rf .firefox_src && zip -r ../ChromeBadgeDeleter.zip . -x '*.git*' 'node_modules/*' '*.env*' 'package*.json' '.firefox_src*' && cp manifest.json manifest_firefox.json && node -e \"let m=require('./manifest_firefox.json'); m.browser_specific_settings={gecko:{id:'badgerdev@robloxbadgedeleter.com', data_collection_permissions:{required:['none']}}}; m.background.scripts=[m.background.service_worker]; require('fs').writeFileSync('manifest_firefox.json', JSON.stringify(m, null, 2));\" && zip -r ../FirefoxBadgeDeleter.zip . -x '*.git*' 'manifest.json' 'node_modules/*' '*.env*' 'package*.json' '.firefox_src*' && printf \"@ manifest_firefox.json\\n@=manifest.json\\n\" | zipnote -w ../FirefoxBadgeDeleter.zip && rm manifest_firefox.json",
+    "deploy:chrome": "export $(grep -v '^#' .env | xargs) && chrome-webstore-upload upload --source ../ChromeBadgeDeleter.zip --auto-publish --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
+    "deploy:firefox": "rm -rf .firefox_src && unzip -q ../FirefoxBadgeDeleter.zip -d .firefox_src && export $(grep -v '^#' .env | xargs) && web-ext sign --source-dir .firefox_src --artifacts-dir ../artifacts --channel listed --api-key $WEB_EXT_API_KEY --api-secret $WEB_EXT_API_SECRET && rm -rf .firefox_src",
+    "deploy": "npm run build && npm run deploy:chrome && npm run deploy:firefox"
+  },
+  "devDependencies": {
+    "chrome-webstore-upload-cli": "^3.1.1",
+    "web-ext": "^8.2.0"
+  }
+}

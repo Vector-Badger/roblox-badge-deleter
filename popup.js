@@ -12,13 +12,14 @@ const matchCount = document.getElementById('matchCount');
 const deleteBtn = document.getElementById('deleteBtn');
 const badgeListContainer = document.getElementById('badgeList');
 
+let selectedCount = 0;
+
 function setStatus(text, color = '#BDBEBE') {
   statusEl.textContent = text;
   statusEl.style.color = color;
 }
 
 function updateSelectionCount() {
-  const selectedCount = matchedBadges.filter(b => b.selected).length;
   matchCount.textContent = `${selectedCount} selected`;
   deleteBtn.disabled = selectedCount === 0;
 }
@@ -27,6 +28,7 @@ function renderBadgeList() {
   badgeListContainer.innerHTML = '';
   const displayLimit = 500;
   const toRender = matchedBadges.slice(0, displayLimit);
+  const fragment = document.createDocumentFragment();
   
   toRender.forEach((item, index) => {
     const div = document.createElement('div');
@@ -38,18 +40,22 @@ function renderBadgeList() {
     checkbox.checked = item.selected;
     
     checkbox.addEventListener('change', (e) => {
-      item.selected = e.target.checked;
-      updateSelectionCount();
+      const isChecked = e.target.checked;
+      if (item.selected !== isChecked) {
+        item.selected = isChecked;
+        selectedCount += isChecked ? 1 : -1;
+        updateSelectionCount();
+      }
     });
 
     const label = document.createElement('label');
     label.htmlFor = `badge-${index}`;
     label.textContent = item.badge.name || `Badge ${item.badge.id}`;
-    label.title = item.badge.name; // full name on hover
+    label.title = item.badge.name || ''; // full name on hover
 
     div.appendChild(checkbox);
     div.appendChild(label);
-    badgeListContainer.appendChild(div);
+    fragment.appendChild(div);
   });
 
   if (matchedBadges.length > displayLimit) {
@@ -59,9 +65,10 @@ function renderBadgeList() {
     overflow.style.textAlign = 'center';
     overflow.style.padding = '8px';
     overflow.textContent = `...and ${matchedBadges.length - displayLimit} more (Filtered out of view)`;
-    badgeListContainer.appendChild(overflow);
+    fragment.appendChild(overflow);
   }
 
+  badgeListContainer.appendChild(fragment);
   updateSelectionCount();
 }
 
@@ -91,33 +98,30 @@ loadBtn.addEventListener('click', () => {
   });
 });
 
+function matchesQuery(badge, query) {
+  if (!query) return false;
+  const bName = badge.name ? badge.name.toLowerCase() : '';
+  const bDesc = badge.description ? badge.description.toLowerCase() : '';
+  const bAwarder = (badge.awarder && badge.awarder.name) ? badge.awarder.name.toLowerCase() : '';
+  return bName.includes(query) || bDesc.includes(query) || bAwarder.includes(query);
+}
+
 function applyFilters() {
   const phrase = phraseFilter.value.trim().toLowerCase();
   const whitelist = whitelistFilter.value.trim().toLowerCase();
   
-  const filtered = allBadges.filter(badge => {
-    if (!phrase) return true;
-    
-    const bName = badge.name ? badge.name.toLowerCase() : '';
-    const bDesc = badge.description ? badge.description.toLowerCase() : '';
-    const bAwarder = (badge.awarder && badge.awarder.name) ? badge.awarder.name.toLowerCase() : '';
-    
-    return bName.includes(phrase) || bDesc.includes(phrase) || bAwarder.includes(phrase);
-  });
+  selectedCount = 0;
+  matchedBadges = [];
 
-  matchedBadges = filtered.map(b => {
-    let isWhitelisted = false;
-    if (whitelist) {
-      const bName = b.name ? b.name.toLowerCase() : '';
-      const bDesc = b.description ? b.description.toLowerCase() : '';
-      const bAwarder = (b.awarder && b.awarder.name) ? b.awarder.name.toLowerCase() : '';
-      
-      if (bName.includes(whitelist) || bDesc.includes(whitelist) || bAwarder.includes(whitelist)) {
-        isWhitelisted = true;
-      }
-    }
-    return { badge: b, selected: !isWhitelisted };
-  });
+  for (let i = 0; i < allBadges.length; i++) {
+    const badge = allBadges[i];
+    if (phrase && !matchesQuery(badge, phrase)) continue;
+    
+    const isWhitelisted = whitelist ? matchesQuery(badge, whitelist) : false;
+    const selected = !isWhitelisted;
+    if (selected) selectedCount++;
+    matchedBadges.push({ badge, selected });
+  }
 
   renderBadgeList();
 }
@@ -136,8 +140,6 @@ if (popOutLink) {
   popOutLink.previousElementSibling.style.display = 'none'; // hide the dot
 }
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
 let badgesToDeleteCache = [];
 
 deleteBtn.addEventListener('click', () => {
@@ -152,6 +154,7 @@ deleteBtn.addEventListener('click', () => {
 });
 
 cancelDeleteBtn.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ action: 'track_analytics', eventName: 'deletion_cancelled', params: { items_cancelled: badgesToDeleteCache.length } });
   badgesToDeleteCache = [];
   stepConfirm.style.display = 'none';
   stepFilter.style.display = 'flex';
@@ -167,9 +170,15 @@ confirmDeleteBtn.addEventListener('click', () => {
   
   const badgeIds = toDelete.map(item => item.badge.id);
 
-  chrome.runtime.sendMessage({ action: 'start_mass_deletion', badgesToDelete: badgeIds });
+  chrome.runtime.sendMessage({ action: 'track_analytics', eventName: 'deletion_started', params: { total_items: badgeIds.length } });
+  chrome.runtime.sendMessage({ action: 'start_mass_deletion', badgesToDelete: badgeIds }, (res) => {
+    if (chrome.runtime.lastError) return;
+    if (res && res.status === 'completed') {
+      setStatus(`Deletion complete! ${res.deleted} deleted, ${res.failed} failed. (Refresh Roblox page to see changes!)`, '#00B06F');
+    }
+  });
 
-  setStatus(`Deletion started! You can safely close this popup—the process will finish automatically in the background.`, '#00B06F');
+  setStatus(`Deletion started! You can safely close this popup, the process will finish automatically in the background.`, '#00B06F');
   
   // Clean up UI so they know it's handled
   badgeListContainer.innerHTML = '';
