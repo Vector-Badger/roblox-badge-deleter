@@ -218,3 +218,14 @@ function trackAnalyticsEvent(eventName, params) {
     })
   }).catch(e => console.error("GA Error", e));
 }
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    getCsrfToken,
+    deleteBadge,
+    getUserId,
+    fetchAllBadges,
+    runMassDeletion,
+    trackAnalyticsEvent
+  };
+}
