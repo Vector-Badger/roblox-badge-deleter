@@ -128,6 +128,77 @@ async function testBackground() {
   assert.equal(massDelRes.deleted, 2);
   assert.equal(massDelRes.failed, 1);
 
+  // Test fallback CSRF Extraction
+  bg.resetState();
+  clearFetchMocks();
+  setFetchMock('https://auth.roblox.com/v2/logout', (options) => {
+    return {
+      headers: { get: () => null }
+    };
+  });
+  setFetchMock('https://badges.roblox.com/v1/user/badges/0', (options) => {
+    return {
+      headers: { get: (header) => header === 'x-csrf-token' ? 'mock-fallback-token' : null }
+    };
+  });
+  const fallbackToken = await bg.getCsrfToken();
+  assert.equal(fallbackToken, 'mock-fallback-token', 'getCsrfToken should return fallback token');
+
+  // Test 403 CSRF Token Refresh Retry
+  bg.resetState();
+  let retryBadgeCalls = 0;
+  setFetchMock('https://badges.roblox.com/v1/user/badges/403', () => {
+    retryBadgeCalls++;
+    if (retryBadgeCalls === 1) {
+      return {
+        status: 403,
+        headers: { get: (h) => h === 'x-csrf-token' ? 'refreshed-token' : null }
+      };
+    }
+    return { ok: true };
+  });
+  const retryDelRes = await bg.deleteBadge(403);
+  assert.equal(retryDelRes.success, true);
+  assert.equal(retryBadgeCalls, 2);
+
+  // Test 429 Rate-Limit Retry and Deletion State Tracking
+  bg.resetState();
+  const origSetTimeout = global.setTimeout;
+  const origDateNow = global.Date.now;
+
+  // Override to mock time progressing without delay
+  global.setTimeout = (cb) => cb();
+  let mockTime = 1000;
+  global.Date.now = () => { mockTime += 1000; return mockTime; };
+
+  let limitBadgeCalls = 0;
+  setFetchMock('https://badges.roblox.com/v1/user/badges/429', () => {
+    limitBadgeCalls++;
+    if (limitBadgeCalls === 1) return { ok: false, status: 429, json: async () => ({}) };
+    return { ok: true };
+  });
+
+  const massDelPromise = bg.runMassDeletion([429]);
+
+  // Check synchronous state setup
+  const initialDelState = bg.getDeletionState();
+  assert.equal(initialDelState.isRunning, true);
+  assert.equal(initialDelState.total, 1);
+
+  const massDelRetryRes = await massDelPromise;
+
+  assert.equal(massDelRetryRes.status, 'completed');
+  assert.equal(massDelRetryRes.deleted, 1);
+  assert.equal(limitBadgeCalls, 2);
+
+  const finalDelState = bg.getDeletionState();
+  assert.equal(finalDelState.isRunning, false);
+  assert.equal(finalDelState.deleted, 1);
+
+  // Restore globals
+  global.setTimeout = origSetTimeout;
+  global.Date.now = origDateNow;
+
   console.log("background.js tests passed!");
 }
 
