@@ -8,7 +8,8 @@
     "deploy:chrome": "export $(grep -v '^#' .env | xargs) && chrome-webstore-upload upload --source ../ChromeBadgeDeleter.zip --auto-publish --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
     "deploy:firefox": "rm -rf .firefox_src && unzip -q ../FirefoxBadgeDeleter.zip -d .firefox_src && export $(grep -v '^#' .env | xargs) && web-ext sign --source-dir .firefox_src --artifacts-dir ../artifacts --channel listed --api-key $WEB_EXT_API_KEY --api-secret $WEB_EXT_API_SECRET && rm -rf .firefox_src",
     "deploy": "npm run build && npm run deploy:chrome && npm run deploy:firefox",
-    "jules:status": "export $(grep -v '^#' .env | xargs) && curl -s -H \"x-goog-api-key: $JULES_API_KEY\" https://jules.googleapis.com/v1alpha/sessions"
+    "jules:status": "export $(grep -v '^#' .env | xargs) && curl -s -H \"x-goog-api-key: $JULES_API_KEY\" https://jules.googleapis.com/v1alpha/sessions | node -e \"const d=JSON.parse(require('fs').readFileSync(0,'utf8')); (d.sessions||[]).forEach(s=>{ const pr=(s.outputs||[]).find(o=>o.pullRequest); console.log('['+(s.state||'ACTIVE')+']', s.id, '-', s.title, '\\n  Live URL:', s.url, pr ? '\\n  PR: '+pr.pullRequest.url : ''); });\"",
+    "jules:logs": "export $(grep -v '^#' .env | xargs) && SID=$(curl -s -H \"x-goog-api-key: $JULES_API_KEY\" https://jules.googleapis.com/v1alpha/sessions | node -e \"const d=JSON.parse(require('fs').readFileSync(0,'utf8')); console.log(d.sessions[0].id);\") && curl -s -H \"x-goog-api-key: $JULES_API_KEY\" \"https://jules.googleapis.com/v1alpha/sessions/$SID/activities\" | node -e \"const d=JSON.parse(require('fs').readFileSync(0,'utf8')); (d.activities||[]).forEach(a=>console.log(a.createTime, a.originator||'', JSON.stringify(a.progressUpdated||a.planGenerated||a.sessionCompleted||a.agentMessaged||a)));\""
   },
   "devDependencies": {
     "chrome-webstore-upload-cli": "^3.1.1",

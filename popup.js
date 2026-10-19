@@ -165,7 +165,7 @@ function pollDeletionStatus() {
   if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.sendMessage) return;
   chrome.runtime.sendMessage({ action: 'get_deletion_status' }, (st) => {
     if (chrome.runtime.lastError || !st) return;
-    if (st.active) {
+    if (st.isRunning || st.active) {
       setStatus(`Deleting in background: ${st.deleted}/${st.total} deleted (${st.failed} failed)... Safe to close popup!`, '#00B06F');
       setTimeout(pollDeletionStatus, 500);
     } else if (st.total > 0) {
