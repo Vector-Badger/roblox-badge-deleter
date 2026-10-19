@@ -258,6 +258,22 @@ async function runMassDeletion(badgesToProcess) {
   return { status: 'completed', deleted: successCount, failed: failCount, lastError: deletionState.lastError };
 }
 
+function getDeletionState() {
+  return deletionState;
+}
+
+function resetState() {
+  cachedCsrfToken = null;
+  csrfPromise = null;
+  deletionState = {
+    isRunning: false,
+    total: 0,
+    deleted: 0,
+    failed: 0,
+    lastError: null
+  };
+}
+
 function trackAnalyticsEvent(eventName, params) {
   // Measurement Protocol for GA4
   // TODO: Replace with your actual Measurement ID and API Secret
@@ -286,6 +302,8 @@ if (typeof module !== 'undefined' && module.exports) {
     getUserId,
     fetchAllBadges,
     runMassDeletion,
-    trackAnalyticsEvent
+    trackAnalyticsEvent,
+    getDeletionState,
+    resetState
   };
 }
