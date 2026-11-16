@@ -1,13 +1,36 @@
 const assert = require('assert').strict;
 
 // Simple Mocks for Browser Globals
+let messageHandler = null;
+let badgeUpdates = 0;
 global.chrome = {
   runtime: {
     onMessage: {
-      addListener: () => {}
+      addListener: (fn) => { messageHandler = fn; }
     },
     sendMessage: () => {}
+  },
+  action: {
+    setBadgeBackgroundColor: () => {},
+    setBadgeText: () => { badgeUpdates++; }
+  },
+  i18n: {
+    getMessage: () => ''
   }
+};
+
+const mockCacheStore = new Map();
+if (typeof global.Response === 'undefined') {
+  global.Response = class {
+    constructor(body) { this._body = body; }
+    async json() { return JSON.parse(this._body); }
+  };
+}
+global.caches = {
+  open: async () => ({
+    put: async (key, res) => { mockCacheStore.set(key, res); },
+    match: async (key) => mockCacheStore.get(key)
+  })
 };
 
 let fetchMockData = {};
@@ -52,6 +75,7 @@ global.document = {
   getElementById: (id) => {
     return mockElements[id] || { style: {}, textContent: '', addEventListener: () => {} };
   },
+  querySelectorAll: () => [],
   createElement: () => ({ style: {}, appendChild: () => {}, addEventListener: () => {} }),
   createDocumentFragment: () => ({ appendChild: () => {} })
 };
@@ -166,8 +190,8 @@ async function testBackground() {
   const origSetTimeout = global.setTimeout;
   const origDateNow = global.Date.now;
 
-  // Override to mock time progressing without delay
-  global.setTimeout = (cb) => cb();
+  // Override to mock time progressing without delay (ignore fetchWithTimeout's 15s abort timer)
+  global.setTimeout = (cb, ms) => (ms > 5000 ? 0 : cb());
   let mockTime = 1000;
   global.Date.now = () => { mockTime += 1000; return mockTime; };
 
@@ -194,6 +218,98 @@ async function testBackground() {
   const finalDelState = bg.getDeletionState();
   assert.equal(finalDelState.isRunning, false);
   assert.equal(finalDelState.deleted, 1);
+
+  // Test Automatic Second-Chance Retry Sweep for transiently failed badges
+  bg.resetState();
+  let transientCalls = 0;
+  setFetchMock('https://badges.roblox.com/v1/user/badges/777', () => {
+    transientCalls++;
+    if (transientCalls === 1) return { ok: false, status: 400, json: async () => ({ errors: [{ message: 'Transient glitch' }] }) };
+    return { ok: true };
+  });
+  const sweepRes = await bg.runMassDeletion([777]);
+  assert.equal(sweepRes.status, 'completed');
+  assert.equal(sweepRes.deleted, 1, 'Transiently failed badge should be recovered by automatic retry sweep');
+  assert.equal(sweepRes.failed, 0);
+  assert.equal(transientCalls, 2);
+  assert.equal(badgeUpdates > 0, true, 'Toolbar action badge should receive progress updates');
+
+  // Test CacheStorage State Persistence & Orphaned Running Normalization on MV3 SW Restart
+  await bg.persistDeletionState({ isRunning: true, total: 98, deleted: 90, failed: 0, lastError: null });
+  bg.resetState();
+  const recovered = await new Promise(resolve => {
+    const isAsync = messageHandler({ action: 'get_deletion_status' }, {}, resolve);
+    assert.equal(isAsync, true);
+  });
+  assert.equal(recovered.total, 98);
+  assert.equal(recovered.deleted, 90);
+  assert.equal(recovered.isRunning, false, 'Interrupted SW state should normalize isRunning to false');
+
+  // Test Sustained 429 + WAF 403 Recovery Across Worker + Wave Cooldowns
+  bg.resetState();
+  let heavy429Calls = 0;
+  setFetchMock('https://badges.roblox.com/v1/user/badges/4290', () => {
+    heavy429Calls++;
+    if (heavy429Calls <= 4) {
+      return {
+        ok: false,
+        status: 429,
+        headers: { get: (h) => h === 'retry-after' ? '5' : null },
+        json: async () => ({})
+      };
+    }
+    if (heavy429Calls <= 12) {
+      return {
+        ok: false,
+        status: 403,
+        headers: { get: (h) => h === 'x-ratelimit-reset' ? '12' : null },
+        json: async () => ({ errors: [{ message: 'WAF Challenge' }] })
+      };
+    }
+    return { ok: true };
+  });
+  const heavyRes = await bg.runMassDeletion([4290]);
+  assert.equal(heavyRes.status, 'completed');
+  assert.equal(heavyRes.deleted, 1, 'Heavy 429 + WAF 403 badge should be rescued inside wave cooldown loop');
+  assert.equal(heavyRes.failed, 0);
+  assert.equal(heavy429Calls, 13);
+
+  // Test Serial Cooldown Prevents Request Stampeding On Queued Badges
+  bg.resetState();
+  const waveCounts = { 901: 0, 902: 0, 903: 0 };
+  setFetchMock('https://badges.roblox.com/v1/user/badges/901', () => {
+    waveCounts[901]++;
+    return waveCounts[901] <= 3 ? { ok: false, status: 429, json: async () => ({}) } : { ok: true };
+  });
+  setFetchMock('https://badges.roblox.com/v1/user/badges/902', () => {
+    waveCounts[902]++;
+    // After 901 waits out Roblox cooldown, 902 should delete in a single clean request
+    return {
+      ok: true,
+      headers: { get: (h) => h === 'x-ratelimit-remaining' ? '0' : (h === 'x-ratelimit-reset' ? '2' : null) }
+    };
+  });
+  setFetchMock('https://badges.roblox.com/v1/user/badges/903', () => {
+    waveCounts[903]++;
+    return waveCounts[903] <= 1 ? { ok: false, status: 429, json: async () => ({}) } : { ok: true };
+  });
+  const waveDrainRes = await bg.runMassDeletion([901, 902, 903]);
+  assert.equal(waveDrainRes.deleted, 3, 'All badges across serial adaptive cooldowns must delete cleanly');
+  assert.equal(waveDrainRes.failed, 0);
+  assert.equal(waveCounts[901], 4);
+  assert.equal(waveCounts[902], 1, '902 must delete in 1 call once 901 clears cooldown');
+  assert.equal(waveCounts[903], 2);
+
+  // Test Non-429 Retry Exhaustion Preserves Real HTTP Error Message
+  bg.resetState();
+  setFetchMock('https://badges.roblox.com/v1/user/badges/5000', () => ({
+    ok: false,
+    status: 500,
+    json: async () => ({ errors: [{ message: 'Internal Server Error' }] })
+  }));
+  const serverErrRes = await bg.runMassDeletion([5000]);
+  assert.equal(serverErrRes.failed, 1);
+  assert.equal(serverErrRes.lastError.includes('Internal Server Error'), true, '500 failure must preserve server error rather than reporting Rate Limited');
 
   // Restore globals
   global.setTimeout = origSetTimeout;

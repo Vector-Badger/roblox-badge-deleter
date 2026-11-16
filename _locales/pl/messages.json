@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Usuwacz odznak dla Roblox"
+ },
+ "appDesc": {
+ "message": "Usuwaj niechciane odznaki Roblox ze swojego ekwipunku w tle."
+ },
+ "loadPrompt": {
+ "message": "Załaduj swój ekwipunek, aby rozpocząć."
+ },
+ "loadBtn": {
+ "message": "Załaduj ekwipunek"
+ },
+ "loadingInventory": {
+ "message": "Ładowanie ekwipunku... to może chwilę potrwać."
+ },
+ "badgesLoaded": {
+ "message": "Załadowane odznaki: "
+ },
+ "phrasePlaceholder": {
+ "message": "Szukana fraza (zostaw puste dla WSZYSTKICH)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Fraza chroniona (np. 'Rzadka')"
+ },
+ "whitelistTooltip": {
+ "message": "Pasujące odznaki zostaną automatycznie ochronione przed usunięciem."
+ },
+ "deleteSelected": {
+ "message": "Usuń zaznaczone"
+ },
+ "confirmTitle": {
+ "message": "Czy na pewno chcesz trwale usunąć odznak?"
+ },
+ "cancelBtn": {
+ "message": "Anuluj"
+ },
+ "deletingTitle": {
+ "message": "Usuwanie odznak w tle"
+ },
+ "deletingSafeToClose": {
+ "message": "Możesz bezpiecznie zamknąć to okno."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Odśwież stronę Roblox, aby zobaczyć zmiany!"
+ },
+ "feedback": {
+ "message": "Opinia"
+ },
+ "donate": {
+ "message": "Wesprzyj"
+ }
+}

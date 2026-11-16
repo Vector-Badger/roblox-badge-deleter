@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Penghapus Lencana untuk Roblox"
+ },
+ "appDesc": {
+ "message": "Hapus lencana Roblox yang tidak diinginkan dari inventaris di latar belakang."
+ },
+ "loadPrompt": {
+ "message": "Muat seluruh inventaris Anda untuk memulai."
+ },
+ "loadBtn": {
+ "message": "Muat Inventaris"
+ },
+ "loadingInventory": {
+ "message": "Memuat inventaris... harap tunggu sebentar."
+ },
+ "badgesLoaded": {
+ "message": "Lencana dimuat: "
+ },
+ "phrasePlaceholder": {
+ "message": "Kata kunci (kosongkan untuk SEMUA)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Kata kunci perlindungan (mis. 'Langka')"
+ },
+ "whitelistTooltip": {
+ "message": "Lencana yang cocok akan otomatis dilindungi dari penghapusan."
+ },
+ "deleteSelected": {
+ "message": "Hapus yang Dipilih"
+ },
+ "confirmTitle": {
+ "message": "Apakah Anda yakin ingin menghapus permanen lencana?"
+ },
+ "cancelBtn": {
+ "message": "Batal"
+ },
+ "deletingTitle": {
+ "message": "Menghapus lencana di latar belakang"
+ },
+ "deletingSafeToClose": {
+ "message": "Anda dapat menutup jendela ini dengan aman."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Segarkan halaman Roblox untuk melihat perubahan!"
+ },
+ "feedback": {
+ "message": "Masukan"
+ },
+ "donate": {
+ "message": "Donasi"
+ }
+}

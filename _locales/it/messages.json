@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Elimina distintivi per Roblox"
+ },
+ "appDesc": {
+ "message": "Elimina i distintivi indesiderati di Roblox in background."
+ },
+ "loadPrompt": {
+ "message": "Carica il tuo inventario per iniziare."
+ },
+ "loadBtn": {
+ "message": "Carica inventario"
+ },
+ "loadingInventory": {
+ "message": "Caricamento inventario in corso..."
+ },
+ "badgesLoaded": {
+ "message": "Distintivi caricati: "
+ },
+ "phrasePlaceholder": {
+ "message": "Frase di ricerca (vuoto per TUTTI)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Frase protetta (es. \"Raro\")"
+ },
+ "whitelistTooltip": {
+ "message": "I distintivi corrispondenti saranno protetti dall'eliminazione."
+ },
+ "deleteSelected": {
+ "message": "Elimina selezionati"
+ },
+ "confirmTitle": {
+ "message": "Confermi di voler eliminare definitivamente distintivi?"
+ },
+ "cancelBtn": {
+ "message": "Annulla"
+ },
+ "deletingTitle": {
+ "message": "Eliminazione distintivi in background"
+ },
+ "deletingSafeToClose": {
+ "message": "Puoi chiudere questa finestra in sicurezza."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Aggiorna la pagina di Roblox per vedere le modifiche!"
+ },
+ "feedback": {
+ "message": "Feedback"
+ },
+ "donate": {
+ "message": "Dona"
+ }
+}

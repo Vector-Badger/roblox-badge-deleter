@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Badge-Entferner für Roblox"
+ },
+ "appDesc": {
+ "message": "Unerwünschte Roblox-Abzeichen im Hintergrund aus dem Inventar löschen."
+ },
+ "loadPrompt": {
+ "message": "Laden Sie Ihr gesamtes Inventar, um zu beginnen."
+ },
+ "loadBtn": {
+ "message": "Inventar laden"
+ },
+ "loadingInventory": {
+ "message": "Inventar wird geladen... bitte warten."
+ },
+ "badgesLoaded": {
+ "message": "Geladene Abzeichen: "
+ },
+ "phrasePlaceholder": {
+ "message": "Suchbegriff (leer lassen für ALLE)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Schutzbegriff (z. B. \"Selten\")"
+ },
+ "whitelistTooltip": {
+ "message": "Passende Abzeichen werden automatisch abgewählt und geschützt."
+ },
+ "deleteSelected": {
+ "message": "Ausgewählte löschen"
+ },
+ "confirmTitle": {
+ "message": "Möchten Sie wirklich Abzeichen dauerhaft löschen?"
+ },
+ "cancelBtn": {
+ "message": "Abbrechen"
+ },
+ "deletingTitle": {
+ "message": "Abzeichen werden im Hintergrund gelöscht"
+ },
+ "deletingSafeToClose": {
+ "message": "Sie können dieses Fenster schließen oder geöffnet lassen."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Roblox-Seite aktualisieren, um Änderungen zu sehen!"
+ },
+ "feedback": {
+ "message": "Feedback"
+ },
+ "donate": {
+ "message": "Spenden"
+ }
+}

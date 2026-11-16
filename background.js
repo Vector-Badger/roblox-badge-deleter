@@ -5,7 +5,8 @@ let deletionState = {
   total: 0,
   deleted: 0,
   failed: 0,
-  lastError: null
+  lastError: null,
+  statusMessage: null
 };
 
 function setToolbarBadge(text, color = '#F68888') {
@@ -15,6 +16,38 @@ function setToolbarBadge(text, color = '#F68888') {
       chrome.action.setBadgeText({ text: String(text) });
     }
   } catch (e) {}
+}
+
+async function waitWithBadgeUpdate(ms, badgeColor = '#00B06F') {
+  let remaining = ms;
+  while (remaining > 0) {
+    const step = Math.min(remaining, 5000);
+    await new Promise(r => setTimeout(r, step));
+    remaining -= step;
+    if (deletionState && deletionState.isRunning) {
+      setToolbarBadge(deletionState.deleted > 0 ? String(deletionState.deleted) : '0', badgeColor);
+    }
+  }
+}
+
+async function persistDeletionState(state) {
+  try {
+    if (typeof caches !== 'undefined' && caches.open) {
+      const cache = await caches.open('badge-deleter-state-v1');
+      await cache.put('https://local.state/deletion', new Response(JSON.stringify(state)));
+    }
+  } catch (e) {}
+}
+
+async function loadPersistedDeletionState() {
+  try {
+    if (typeof caches !== 'undefined' && caches.open) {
+      const cache = await caches.open('badge-deleter-state-v1');
+      const res = await cache.match('https://local.state/deletion');
+      if (res) return await res.json();
+    }
+  } catch (e) {}
+  return null;
 }
 
 async function getCsrfToken() {
@@ -54,6 +87,44 @@ async function getCsrfToken() {
   return csrfPromise;
 }
 
+function getRetryDelayMs(headers) {
+  if (!headers || typeof headers.get !== 'function') return 0;
+  const retryAfter = headers.get('retry-after');
+  if (retryAfter) {
+    const asSeconds = Number(retryAfter);
+    if (Number.isFinite(asSeconds) && asSeconds > 0) {
+      return Math.min(asSeconds * 1000, 120000);
+    }
+    const asDate = Date.parse(retryAfter);
+    if (Number.isFinite(asDate)) {
+      const delta = asDate - Date.now();
+      if (delta > 0) return Math.min(delta, 120000);
+    }
+  }
+  const resetHeader = headers.get('x-ratelimit-reset');
+  if (resetHeader) {
+    const resetVal = Number(resetHeader);
+    if (Number.isFinite(resetVal) && resetVal > 0) {
+      const deltaMs = resetVal > 1e9 ? (resetVal * 1000 - Date.now()) : (resetVal * 1000);
+      if (deltaMs > 0) return Math.min(deltaMs, 120000);
+    }
+  }
+  return 0;
+}
+
+async function fetchWithTimeout(url, options = {}, timeoutMs = 15000) {
+  if (typeof AbortController === 'undefined') {
+    return fetch(url, options);
+  }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function deleteBadge(badgeId) {
   let csrfToken = cachedCsrfToken;
   if (!csrfToken) {
@@ -65,31 +136,34 @@ async function deleteBadge(badgeId) {
   }
   
   const safeBadgeId = encodeURIComponent(badgeId);
-  let response = await fetch(`https://badges.roblox.com/v1/user/badges/${safeBadgeId}`, {
+  const requestInit = () => ({
     method: 'DELETE',
     credentials: 'include',
     headers: {
       'x-csrf-token': csrfToken
     }
   });
+  let response = await fetchWithTimeout(`https://badges.roblox.com/v1/user/badges/${safeBadgeId}`, requestInit());
 
   if (response.status === 403 && response.headers && response.headers.get('x-csrf-token')) {
     csrfToken = response.headers.get('x-csrf-token');
     cachedCsrfToken = csrfToken; 
     
-    response = await fetch(`https://badges.roblox.com/v1/user/badges/${safeBadgeId}`, {
-      method: 'DELETE',
-      credentials: 'include',
-      headers: {
-        'x-csrf-token': csrfToken
-      }
-    });
+    response = await fetchWithTimeout(`https://badges.roblox.com/v1/user/badges/${safeBadgeId}`, requestInit());
   }
 
   if (response.ok) {
-    return { success: true };
+    let preemptiveWaitMs = 0;
+    if (response.headers && typeof response.headers.get === 'function') {
+      const remaining = response.headers.get('x-ratelimit-remaining');
+      if (remaining !== null && Number(remaining) <= 0) {
+        preemptiveWaitMs = getRetryDelayMs(response.headers);
+      }
+    }
+    return { success: true, preemptiveWaitMs };
   } else {
     let errorMsg = `HTTP Error ${response.status}`;
+    const retryAfterMs = getRetryDelayMs(response.headers);
     try {
       const data = await response.json();
       if (data.errors && data.errors.length > 0) {
@@ -98,7 +172,7 @@ async function deleteBadge(badgeId) {
     } catch (e) {
       console.warn("Could not parse error JSON:", e);
     }
-    return { success: false, error: errorMsg, status: response.status };
+    return { success: false, error: errorMsg, status: response.status, retryAfterMs };
   }
 }
 
@@ -144,6 +218,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true; 
   } else if (message.action === 'fetch_all_badges') {
+    deletionState = { isRunning: false, total: 0, deleted: 0, failed: 0, lastError: null, statusMessage: null };
+    setToolbarBadge('');
+    persistDeletionState(deletionState);
     fetchAllBadges()
       .then(result => sendResponse(result))
       .catch(error => sendResponse({ success: false, error: error.message }));
@@ -158,8 +235,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       });
     return true;
   } else if (message.action === 'get_deletion_status') {
-    sendResponse(deletionState);
-    return false;
+    if (deletionState.isRunning || deletionState.total > 0 || typeof caches === 'undefined') {
+      sendResponse(deletionState);
+      return false;
+    }
+    loadPersistedDeletionState().then(saved => {
+      if (saved && saved.total > 0) {
+        if (saved.isRunning) {
+          saved.isRunning = false;
+          saved.lastError = saved.lastError || 'Background worker was interrupted before finishing.';
+          persistDeletionState(saved);
+        }
+        deletionState = saved;
+      }
+      sendResponse(deletionState);
+    });
+    return true;
   } else if (message.action === 'track_analytics') {
     trackAnalyticsEvent(message.eventName, message.params);
     sendResponse({ success: true });
@@ -177,85 +268,176 @@ async function runMassDeletion(badgesToProcess) {
     total: badgesToProcess.length,
     deleted: 0,
     failed: 0,
-    lastError: null
+    lastError: null,
+    statusMessage: null
   };
-  setToolbarBadge(badgesToProcess.length, '#F68888');
+  persistDeletionState(deletionState);
+  setToolbarBadge('0', '#00B06F');
 
-  // Pre-warm CSRF token before spawning workers
   try {
-    await getCsrfToken();
-  } catch (e) {
-    console.warn("Initial CSRF token fetch warning:", e);
-  }
-
-  const CONCURRENCY = 5;
-  let currentIndex = 0;
-  let successCount = 0;
-  let failCount = 0;
-  let rateLimitPauseUntil = 0;
-
-  async function worker() {
-    while (currentIndex < badgesToProcess.length) {
-      const badgeId = badgesToProcess[currentIndex++];
-      
-      let retries = 0;
-      let deleted = false;
-      while (retries < 3 && !deleted) {
-        const now = Date.now();
-        if (now < rateLimitPauseUntil) {
-          await new Promise(r => setTimeout(r, rateLimitPauseUntil - now));
-        }
-
-        try {
-          const res = await deleteBadge(badgeId);
-          if (res.success) {
-            successCount++;
-            deletionState.deleted = successCount;
-            deleted = true;
-          } else if (res.status === 429) {
-            rateLimitPauseUntil = Math.max(rateLimitPauseUntil, Date.now() + 3000);
-            await new Promise(r => setTimeout(r, 3000));
-            retries++;
-          } else {
-            console.error(`Failed deleting badge ${badgeId}:`, res.error);
-            deletionState.lastError = res.error;
-            failCount++;
-            deletionState.failed = failCount;
-            break;
-          }
-        } catch (e) {
-          console.error(`Exception deleting badge ${badgeId}:`, e);
-          deletionState.lastError = e.message;
-          failCount++;
-          deletionState.failed = failCount;
-          break;
-        }
-      }
-      if (!deleted && retries >= 3) {
-        failCount++;
-        deletionState.failed = failCount;
-      }
-      const remaining = Math.max(0, badgesToProcess.length - (successCount + failCount));
-      setToolbarBadge(remaining > 0 ? remaining : '', '#F68888');
-      await new Promise(r => setTimeout(r, 100)); // slight stagger
+    // Pre-warm CSRF token before spawning workers
+    try {
+      await getCsrfToken();
+    } catch (e) {
+      console.warn("Initial CSRF token fetch warning:", e);
     }
-  }
 
-  const workerCount = Math.min(CONCURRENCY, badgesToProcess.length);
-  await Promise.all(Array.from({ length: workerCount }, () => worker()));
+    const START_STAGGER_MS = 250;
+    const THROTTLED_FLOOR_MS = 1050;
+    const CRUISING_START_MS = 1150;
+    const MAX_STAGGER_MS = 3500;
+    // Roblox web endpoints use a ~60s rolling bucket and escalate up to 5-15m when hammered mid-429.
+    // Wait full cooldown intervals so tokens refill cleanly instead of repeatedly resetting the timer.
+    const COOLDOWNS_MS = [60000, 60000, 90000, 120000, 120000, 150000, 180000, 180000, 180000, 180000, 180000, 180000];
+    let successCount = 0;
+    let failCount = 0;
+    let pacingDelayMs = START_STAGGER_MS;
+    let throttledOnce = false;
+    let cleanStreak = 0;
+    const glitchRetryQueue = [];
 
-  deletionState.isRunning = false;
-  if (successCount > 0) {
-    setToolbarBadge('✓', '#00B06F');
-    setTimeout(() => setToolbarBadge(''), 4000);
-  } else {
-    setToolbarBadge('!', '#F68888');
-  }
+    function isRetryableStatus(status) {
+      return status === 429 || status === 408 || status === 403 || status >= 500 || status === 0;
+    }
 
-  if (successCount > 0 || failCount > 0) {
-    trackAnalyticsEvent('mass_deletion_complete', { count: successCount, failed: failCount });
+    function formatAttemptError(status, message) {
+      if (status === 429) return 'Max retries exceeded (Rate Limited)';
+      return `Max retries exceeded (${message || `HTTP Error ${status}`})`;
+    }
+
+    function recordDeleted() {
+      successCount++;
+      deletionState.deleted = successCount;
+      setToolbarBadge(String(successCount), '#00B06F');
+      persistDeletionState(deletionState);
+    }
+
+    function recordFailed(badgeId, errorMsg) {
+      console.warn(`Failed deleting badge ${badgeId} after cooldown recovery:`, errorMsg);
+      deletionState.lastError = errorMsg;
+      failCount++;
+      deletionState.failed = failCount;
+      persistDeletionState(deletionState);
+    }
+
+    async function tryDeleteSingle(badgeId) {
+      try {
+        const res = await deleteBadge(badgeId);
+        if (res.success) return { success: true, preemptiveWaitMs: res.preemptiveWaitMs || 0 };
+        return {
+          success: false,
+          retryable: isRetryableStatus(res.status),
+          status: res.status,
+          error: res.error || `HTTP Error ${res.status}`,
+          retryAfterMs: res.retryAfterMs || 0
+        };
+      } catch (e) {
+        return {
+          success: false,
+          retryable: true,
+          status: 0,
+          error: e.message || 'Network error',
+          retryAfterMs: 0
+        };
+      }
+    }
+
+    async function processBadgeAdaptively(badgeId, allowGlitchDefer) {
+      let stalledRetries = 0;
+      let didQuickCsrfRetry = false;
+
+      while (true) {
+        const res = await tryDeleteSingle(badgeId);
+        if (res.success) {
+          recordDeleted();
+          cleanStreak++;
+          if (throttledOnce && cleanStreak >= 40) {
+            pacingDelayMs = Math.max(THROTTLED_FLOOR_MS, pacingDelayMs - 50);
+            cleanStreak = 0;
+          }
+          if (res.preemptiveWaitMs > 0) {
+            deletionState.statusMessage = `Cooldown: waiting ${Math.max(1, Math.round(res.preemptiveWaitMs / 1000))}s before next quota window...`;
+            persistDeletionState(deletionState);
+            await waitWithBadgeUpdate(res.preemptiveWaitMs, '#F68802');
+            deletionState.statusMessage = null;
+            persistDeletionState(deletionState);
+          }
+          return true;
+        }
+
+        if (!res.retryable) {
+          if (allowGlitchDefer) {
+            glitchRetryQueue.push({ badgeId, lastError: res.error });
+          } else {
+            recordFailed(badgeId, res.error);
+          }
+          return false;
+        }
+
+        cleanStreak = 0;
+        if (res.status === 403 || res.status === 0) {
+          cachedCsrfToken = null;
+        }
+
+        // Only do one rapid retry for genuine CSRF expiry; everything else rests for full recovery
+        if (res.status === 403 && !didQuickCsrfRetry && stalledRetries === 0) {
+          didQuickCsrfRetry = true;
+          await new Promise(r => setTimeout(r, 600));
+          continue;
+        }
+
+        if (stalledRetries >= COOLDOWNS_MS.length) {
+          recordFailed(badgeId, formatAttemptError(res.status, res.error));
+          return false;
+        }
+
+        throttledOnce = true;
+        pacingDelayMs = Math.min(Math.max(CRUISING_START_MS, Math.round(pacingDelayMs * 1.35)), MAX_STAGGER_MS);
+        const waitMs = Math.max(res.retryAfterMs || 0, COOLDOWNS_MS[stalledRetries]);
+        stalledRetries++;
+
+        deletionState.statusMessage = `Rate limited by Roblox — resting ${Math.max(1, Math.round(waitMs / 1000))}s so quota resets cleanly...`;
+        persistDeletionState(deletionState);
+        await waitWithBadgeUpdate(waitMs, '#F68802');
+        deletionState.statusMessage = null;
+        persistDeletionState(deletionState);
+      }
+    }
+
+    // Sequential pacing eliminates concurrent 429 collisions against Roblox's single-session bucket
+    for (let i = 0; i < badgesToProcess.length; i++) {
+      await processBadgeAdaptively(badgesToProcess[i], true);
+      if (i < badgesToProcess.length - 1) {
+        await new Promise(r => setTimeout(r, pacingDelayMs));
+      }
+    }
+
+    // Single verification pass for any transient non-429 client glitches (e.g., 400)
+    for (let j = 0; j < glitchRetryQueue.length; j++) {
+      const item = glitchRetryQueue[j];
+      const recovered = await processBadgeAdaptively(item.badgeId, false);
+      if (!recovered && j < glitchRetryQueue.length - 1) {
+        await new Promise(r => setTimeout(r, 150));
+      }
+    }
+
+    deletionState.statusMessage = null;
+    deletionState.isRunning = false;
+    await persistDeletionState(deletionState);
+    if (successCount > 0) {
+      setToolbarBadge('✓', '#00B06F');
+      setTimeout(() => { if (!deletionState.isRunning) setToolbarBadge(''); }, 4000);
+    } else {
+      setToolbarBadge('!', '#F68888');
+    }
+
+    if (successCount > 0 || failCount > 0) {
+      trackAnalyticsEvent('mass_deletion_complete', { count: successCount, failed: failCount });
+    }
+    return { status: 'completed', deleted: successCount, failed: failCount, lastError: deletionState.lastError };
+  } finally {
+    deletionState.isRunning = false;
   }
-  return { status: 'completed', deleted: successCount, failed: failCount, lastError: deletionState.lastError };
 }
 
 function getDeletionState() {
@@ -270,7 +452,8 @@ function resetState() {
     total: 0,
     deleted: 0,
     failed: 0,
-    lastError: null
+    lastError: null,
+    statusMessage: null
   };
 }
 
@@ -304,6 +487,8 @@ if (typeof module !== 'undefined' && module.exports) {
     runMassDeletion,
     trackAnalyticsEvent,
     getDeletionState,
-    resetState
+    resetState,
+    persistDeletionState,
+    loadPersistedDeletionState
   };
 }

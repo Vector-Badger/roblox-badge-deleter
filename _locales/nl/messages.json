@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Badgeverwijderaar voor Roblox"
+ },
+ "appDesc": {
+ "message": "Verwijder ongewenste Roblox-badges op de achtergrond uit uw inventaris."
+ },
+ "loadPrompt": {
+ "message": "Laad uw hele inventaris om te beginnen."
+ },
+ "loadBtn": {
+ "message": "Inventaris laden"
+ },
+ "loadingInventory": {
+ "message": "Inventaris laden... even geduld."
+ },
+ "badgesLoaded": {
+ "message": "Geladen badges: "
+ },
+ "phrasePlaceholder": {
+ "message": "Doelzin (leeg laten voor ALLES)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Beschermde term (bijv. 'Zeldzaam')"
+ },
+ "whitelistTooltip": {
+ "message": "Overeenkomende badges worden beschermd tegen verwijdering."
+ },
+ "deleteSelected": {
+ "message": "Geselecteerde verwijderen"
+ },
+ "confirmTitle": {
+ "message": "Weet u zeker dat u badges definitief wilt verwijderen?"
+ },
+ "cancelBtn": {
+ "message": "Annuleren"
+ },
+ "deletingTitle": {
+ "message": "Badges worden op de achtergrond verwijderd"
+ },
+ "deletingSafeToClose": {
+ "message": "U kunt dit venster veilig sluiten."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Vernieuw de Roblox-pagina om de wijzigingen te zien!"
+ },
+ "feedback": {
+ "message": "Feedback"
+ },
+ "donate": {
+ "message": "Doneren"
+ }
+}

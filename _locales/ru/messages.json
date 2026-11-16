@@ -1,0 +1,58 @@
+{
+ "appName": {
+ "message": "Удалитель значков для Roblox",
+ "description": "Название расширения"
+ },
+ "appDesc": {
+ "message": "Удаляйте ненужные значки Roblox из своего инвентаря в фоновом режиме.",
+ "description": "Описание расширения"
+ },
+ "loadPrompt": {
+ "message": "Загрузите весь инвентарь для начала."
+ },
+ "loadBtn": {
+ "message": "Загрузить инвентарь"
+ },
+ "loadingInventory": {
+ "message": "Загрузка инвентаря... это может занять некоторое время."
+ },
+ "badgesLoaded": {
+ "message": "Загружено значков: "
+ },
+ "phrasePlaceholder": {
+ "message": "Ключевое слово (оставьте пустым для ВСЕХ)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Исключения (например, 'Rare')"
+ },
+ "whitelistTooltip": {
+ "message": "Значки с этим текстом будут автоматически защищены от удаления."
+ },
+ "deleteSelected": {
+ "message": "Удалить выбранные"
+ },
+ "confirmTitle": {
+ "message": "Вы действительно хотите удалить значков навсегда?"
+ },
+ "cancelBtn": {
+ "message": "Отмена"
+ },
+ "deletingTitle": {
+ "message": "Удаление значков в фоновом режиме"
+ },
+ "deletingSafeToClose": {
+ "message": "Вы можете безопасно закрыть это окно или оставить его открытым."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Обновите страницу Roblox, чтобы увидеть изменения!"
+ },
+ "feedback": {
+ "message": "Отзыв"
+ },
+ "donate": {
+ "message": "Поддержать"
+ }
+}

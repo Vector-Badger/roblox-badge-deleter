@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Roblox 徽章批量刪除器"
+ },
+ "appDesc": {
+ "message": "在背景中輕鬆從您的清單中批次刪除不需要的 Roblox 徽章。"
+ },
+ "loadPrompt": {
+ "message": "請先載入您的完整庫存以開始。"
+ },
+ "loadBtn": {
+ "message": "載入庫存"
+ },
+ "loadingInventory": {
+ "message": "正在載入庫存... 請稍候。"
+ },
+ "badgesLoaded": {
+ "message": "已載入徽章："
+ },
+ "phrasePlaceholder": {
+ "message": "搜尋關鍵字（留空全選）"
+ },
+ "whitelistPlaceholder": {
+ "message": "保護白名單（例如：稀有）"
+ },
+ "whitelistTooltip": {
+ "message": "相符的徽章將自動取消選取並受到保護。"
+ },
+ "deleteSelected": {
+ "message": "刪除所選徽章"
+ },
+ "confirmTitle": {
+ "message": "確定要永久刪除這 個徽章嗎？"
+ },
+ "cancelBtn": {
+ "message": "取消"
+ },
+ "deletingTitle": {
+ "message": "正在背景刪除徽章"
+ },
+ "deletingSafeToClose": {
+ "message": "您可以安全關閉此視窗或在此觀察進度。"
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "重新整理 Roblox 頁面以查看變更！"
+ },
+ "feedback": {
+ "message": "意見回饋"
+ },
+ "donate": {
+ "message": "贊助支持"
+ }
+}

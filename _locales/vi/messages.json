@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Trình xóa huy hiệu cho Roblox"
+ },
+ "appDesc": {
+ "message": "Xóa các huy hiệu Roblox không mong muốn khỏi kho đồ trong nền."
+ },
+ "loadPrompt": {
+ "message": "Tải toàn bộ kho đồ của bạn để bắt đầu."
+ },
+ "loadBtn": {
+ "message": "Tải kho đồ"
+ },
+ "loadingInventory": {
+ "message": "Đang tải kho đồ... vui lòng đợi trong giây lát."
+ },
+ "badgesLoaded": {
+ "message": "Huy hiệu đã tải: "
+ },
+ "phrasePlaceholder": {
+ "message": "Từ khóa (để trống để chọn TẤT CẢ)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Từ khóa bảo vệ (ví dụ: 'Hiếm')"
+ },
+ "whitelistTooltip": {
+ "message": "Các huy hiệu phù hợp sẽ tự động được bảo vệ khỏi bị xóa."
+ },
+ "deleteSelected": {
+ "message": "Xóa các mục đã chọn"
+ },
+ "confirmTitle": {
+ "message": "Bạn có chắc chắn muốn xóa vĩnh viễn huy hiệu không?"
+ },
+ "cancelBtn": {
+ "message": "Hủy"
+ },
+ "deletingTitle": {
+ "message": "Đang xóa huy hiệu trong nền"
+ },
+ "deletingSafeToClose": {
+ "message": "Bạn có thể đóng cửa sổ này một cách an toàn."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Làm mới trang Roblox để xem các thay đổi!"
+ },
+ "feedback": {
+ "message": "Góp ý"
+ },
+ "donate": {
+ "message": "Ủng hộ"
+ }
+}

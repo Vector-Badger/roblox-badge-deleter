@@ -1,0 +1,58 @@
+{
+ "appName": {
+ "message": "Badge Deleter for Roblox",
+ "description": "The name of the extension"
+ },
+ "appDesc": {
+ "message": "Delete unwanted Roblox badges from your inventory in the background.",
+ "description": "The description of the extension"
+ },
+ "loadPrompt": {
+ "message": "Gather your entire inventory to begin."
+ },
+ "loadBtn": {
+ "message": "Load Inventory"
+ },
+ "loadingInventory": {
+ "message": "Loading inventory... this may take a moment."
+ },
+ "badgesLoaded": {
+ "message": "Badges loaded: "
+ },
+ "phrasePlaceholder": {
+ "message": "Target phrase (leave empty for ALL)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Whitelist phrase (e.g. 'Rare')"
+ },
+ "whitelistTooltip": {
+ "message": "Badges matching this phrase will be automatically unchecked and protected from deletion."
+ },
+ "deleteSelected": {
+ "message": "Delete Selected"
+ },
+ "confirmTitle": {
+ "message": "Are you sure you want to permanently delete badges?"
+ },
+ "cancelBtn": {
+ "message": "Cancel"
+ },
+ "deletingTitle": {
+ "message": "Deleting Badges in Background"
+ },
+ "deletingSafeToClose": {
+ "message": "Safe to close this popup or leave it open to watch."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Refresh Roblox page to see changes!"
+ },
+ "feedback": {
+ "message": "Feedback"
+ },
+ "donate": {
+ "message": "Donate"
+ }
+}

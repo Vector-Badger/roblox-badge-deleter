@@ -9,20 +9,20 @@
     <div style="text-align: center; margin-bottom: 8px;">
       <img src="icon128.png" alt="Logo" style="width: 56px; height: 56px; display: inline-block; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));">
     </div>
-    <h2 style="margin-top: 0;">Badge Deleter</h2>
+    <h2 style="margin-top: 0;" data-i18n="appName">Badge Deleter</h2>
     
     <div id="step-load">
-      <p>Gather your entire inventory to begin.</p>
-      <button id="loadBtn">Load Inventory</button>
+      <p data-i18n="loadPrompt">Gather your entire inventory to begin.</p>
+      <button id="loadBtn" data-i18n="loadBtn">Load Inventory</button>
     </div>
 
     <div id="step-filter" style="display: none;">
       <p id="inventoryStats">Badges loaded: 0</p>
-      <input type="text" id="phraseFilter" placeholder="Target phrase (leave empty for ALL)">
+      <input type="text" id="phraseFilter" placeholder="Target phrase (leave empty for ALL)" data-i18n-placeholder="phrasePlaceholder">
       
       <div class="input-wrapper">
-        <input type="text" id="whitelistFilter" placeholder="Whitelist phrase (e.g. 'Rare')">
-        <span class="info-icon" title="Badges matching this phrase will be automatically unchecked and protected from deletion.">i</span>
+        <input type="text" id="whitelistFilter" placeholder="Whitelist phrase (e.g. 'Rare')" data-i18n-placeholder="whitelistPlaceholder">
+        <span class="info-icon" title="Badges matching this phrase will be automatically unchecked and protected from deletion." data-i18n-title="whitelistTooltip">i</span>
       </div>
       
       <div id="badgeList" class="scrollable-list">
@@ -32,27 +32,37 @@
       <div class="match-stats">
         <span id="matchCount">0 selected</span>
       </div>
-      <button id="deleteBtn" class="danger" disabled>Delete Selected</button>
+      <button id="deleteBtn" class="danger" disabled data-i18n="deleteSelected">Delete Selected</button>
     </div>
 
     <div id="step-confirm" style="display: none;">
       <p class="warning-text">Are you sure you want to permanently delete <span id="confirmCount"></span> badges?</p>
       <div class="button-group">
-        <button id="cancelDeleteBtn" class="secondary">Cancel</button>
+        <button id="cancelDeleteBtn" class="secondary" data-i18n="cancelBtn">Cancel</button>
         <button id="confirmDeleteBtn" class="danger">&#10006;</button>
       </div>
     </div>
 
-
+    <div id="step-deleting" style="display: none; flex-direction: column; gap: 10px; text-align: center;">
+      <p style="font-size: 14px; color: #FFFFFF; font-weight: 600;" data-i18n="deletingTitle">Deleting Badges in Background</p>
+      <div style="background: #111214; border-radius: 8px; border: 1px solid #393b3d; overflow: hidden; height: 14px; margin: 2px 0;">
+        <div id="deletionProgressBar" style="background: #00B06F; height: 100%; width: 0%; transition: width 0.3s ease;"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: bold;">
+        <span id="deletionCountText" style="color: #00B06F;">0 / 0 deleted</span>
+        <span id="deletionFailedText" style="color: #F68888; display: none;">0 failed</span>
+      </div>
+      <p style="font-size: 11px; color: #888;" data-i18n="deletingSafeToClose">Safe to close this popup or leave it open to watch.</p>
+    </div>
 
     <div id="status"></div>
 
     <div class="footer" style="display: flex; justify-content: center; gap: 8px; font-size: 12px; color: #888;">
-      <a href="mailto:delbadger.dev@gmail.com?subject=Badge%20Deleter%20Support" id="feedbackLink" style="color: #BDBEBE; text-decoration: none;">Feedback</a>
+      <a href="https://github.com/Vector-Badger/roblox-badge-deleter/issues" id="feedbackLink" target="_blank" style="color: #BDBEBE; text-decoration: none;" data-i18n="feedback">Feedback</a>
       <span>&bull;</span>
       <a href="#" id="popOutLink" title="Open in a dedicated tab to run safely in the background!" style="color: #BDBEBE; text-decoration: none;">Pop Out Tab <span style="cursor:help" title="Pop out into a full tab to run in the background safely!">(?)</span></a>
       <span>&bull;</span>
-      <a href="https://ko-fi.com/badgerdev" id="donateLink" target="_blank" title="Support the developer" style="color: #BDBEBE; text-decoration: none;">Donate</a>
+      <a href="https://ko-fi.com/badgerdev" id="donateLink" target="_blank" title="Support the developer" style="color: #BDBEBE; text-decoration: none;" data-i18n="donate">Donate</a>
     </div>
   </div>
   <script src="popup.js"></script>

@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Tagabura ng Badge para sa Roblox"
+ },
+ "appDesc": {
+ "message": "Tanggalin ang mga hindi gustong badge sa Roblox sa background."
+ },
+ "loadPrompt": {
+ "message": "I-load ang iyong buong imbentaryo upang magsimula."
+ },
+ "loadBtn": {
+ "message": "I-load ang Imbentaryo"
+ },
+ "loadingInventory": {
+ "message": "Naglo-load ng imbentaryo... mangyaring maghintay."
+ },
+ "badgesLoaded": {
+ "message": "Na-load na mga badge: "
+ },
+ "phrasePlaceholder": {
+ "message": "Salita sa paghahanap (iwanang blangko para sa LAHAT)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Protektadong salita (hal. 'Rare')"
+ },
+ "whitelistTooltip": {
+ "message": "Ang mga tugmang badge ay awtomatikong poprotektahan laban sa pagbura."
+ },
+ "deleteSelected": {
+ "message": "Burahin ang Napili"
+ },
+ "confirmTitle": {
+ "message": "Sigurado ka bang gusto mong permanenteng burahin ang badge?"
+ },
+ "cancelBtn": {
+ "message": "Kanselahin"
+ },
+ "deletingTitle": {
+ "message": "Binubura ang mga badge sa background"
+ },
+ "deletingSafeToClose": {
+ "message": "Maaari mong isara ang window na ito nang ligtas."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "I-refresh ang pahina ng Roblox upang makita ang mga pagbabago!"
+ },
+ "feedback": {
+ "message": "Feedback"
+ },
+ "donate": {
+ "message": "Mag-donate"
+ }
+}

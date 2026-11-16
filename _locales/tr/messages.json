@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Roblox Rozet Silici"
+ },
+ "appDesc": {
+ "message": "İstemediğiniz Roblox rozetlerini arka planda envanterinizden silin."
+ },
+ "loadPrompt": {
+ "message": "Başlamak için tüm envanterinizi yükleyin."
+ },
+ "loadBtn": {
+ "message": "Envanteri Yükle"
+ },
+ "loadingInventory": {
+ "message": "Envanter yükleniyor... lütfen bekleyin."
+ },
+ "badgesLoaded": {
+ "message": "Yüklenen rozetler: "
+ },
+ "phrasePlaceholder": {
+ "message": "Hedef kelime (HEPSİ için boş bırakın)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Korunan kelime (örn: 'Nadir')"
+ },
+ "whitelistTooltip": {
+ "message": "Eşleşen rozetler koruma altına alınacak ve silinmeyecektir."
+ },
+ "deleteSelected": {
+ "message": "Seçilenleri Sil"
+ },
+ "confirmTitle": {
+ "message": " rozeti kalıcı olarak silmek istediğinizden emin misiniz?"
+ },
+ "cancelBtn": {
+ "message": "İptal"
+ },
+ "deletingTitle": {
+ "message": "Rozetler arka planda siliniyor"
+ },
+ "deletingSafeToClose": {
+ "message": "Bu pencereyi güvenle kapatabilirsiniz."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Değişiklikleri görmek için Roblox sayfasını yenileyin!"
+ },
+ "feedback": {
+ "message": "Geri Bildirim"
+ },
+ "donate": {
+ "message": "Bağış Yap"
+ }
+}

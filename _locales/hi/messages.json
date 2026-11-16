@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Roblox के लिए बैज रिमूवर"
+ },
+ "appDesc": {
+ "message": "पृष्ठभूमि में अपनी इन्वेंट्री से अवांछित Roblox बैज हटाएं।"
+ },
+ "loadPrompt": {
+ "message": "शुरू करने के लिए अपनी पूरी इन्वेंट्री लोड करें।"
+ },
+ "loadBtn": {
+ "message": "इन्वेंट्री लोड करें"
+ },
+ "loadingInventory": {
+ "message": "इन्वेंट्री लोड हो रही है... कृपया प्रतीक्षा करें।"
+ },
+ "badgesLoaded": {
+ "message": "लोड किए गए बैज: "
+ },
+ "phrasePlaceholder": {
+ "message": "खोज शब्द (सभी के लिए खाली छोड़ें)"
+ },
+ "whitelistPlaceholder": {
+ "message": "सुरक्षित शब्द (जैसे 'दुर्लभ')"
+ },
+ "whitelistTooltip": {
+ "message": "मिलान वाले बैज को स्वचालित रूप से सुरक्षित किया जाएगा।"
+ },
+ "deleteSelected": {
+ "message": "चयनित हटाएं"
+ },
+ "confirmTitle": {
+ "message": "क्या आप वाकई बैज स्थायी रूप से हटाना चाहते हैं?"
+ },
+ "cancelBtn": {
+ "message": "रद्द करें"
+ },
+ "deletingTitle": {
+ "message": "पृष्ठभूमि में बैज हटाए जा रहे हैं"
+ },
+ "deletingSafeToClose": {
+ "message": "आप इस विंडो को सुरक्षित रूप से बंद कर सकते हैं।"
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "बदलाव देखने के लिए Roblox पेज को रीफ्रेश करें!"
+ },
+ "feedback": {
+ "message": "प्रतिक्रिया"
+ },
+ "donate": {
+ "message": "दान करें"
+ }
+}

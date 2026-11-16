@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "เครื่องมือลบเหรียญตราสำหรับ Roblox"
+ },
+ "appDesc": {
+ "message": "ลบเหรียญตรา Roblox ที่ไม่ต้องการออกจากคลังของคุณในพื้นหลัง"
+ },
+ "loadPrompt": {
+ "message": "โหลดคลังทั้งหมดของคุณเพื่อเริ่มต้น"
+ },
+ "loadBtn": {
+ "message": "โหลดคลัง"
+ },
+ "loadingInventory": {
+ "message": "กำลังโหลดคลัง... โปรดรอสักครู่"
+ },
+ "badgesLoaded": {
+ "message": "เหรียญตราที่โหลดแล้ว: "
+ },
+ "phrasePlaceholder": {
+ "message": "คำค้นหา (เว้นว่างไว้เพื่อเลือกทั้งหมด)"
+ },
+ "whitelistPlaceholder": {
+ "message": "คำที่ต้องการป้องกัน (เช่น 'หายาก')"
+ },
+ "whitelistTooltip": {
+ "message": "เหรียญตราที่ตรงกันจะได้รับการป้องกันไม่ให้ถูกลบโดยอัตโนมัติ"
+ },
+ "deleteSelected": {
+ "message": "ลบรายการที่เลือก"
+ },
+ "confirmTitle": {
+ "message": "คุณแน่ใจหรือไม่ว่าต้องการลบเหรียญตรา รายการอย่างถาวร?"
+ },
+ "cancelBtn": {
+ "message": "ยกเลิก"
+ },
+ "deletingTitle": {
+ "message": "กำลังลบเหรียญตราในพื้นหลัง"
+ },
+ "deletingSafeToClose": {
+ "message": "คุณสามารถปิดหน้าต่างนี้ได้อย่างปลอดภัย"
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "รีเฟรชหน้า Roblox เพื่อดูการเปลี่ยนแปลง!"
+ },
+ "feedback": {
+ "message": "ข้อเสนอแนะ"
+ },
+ "donate": {
+ "message": "บริจาค"
+ }
+}

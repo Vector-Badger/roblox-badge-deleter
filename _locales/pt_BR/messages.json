@@ -1,0 +1,58 @@
+{
+ "appName": {
+ "message": "Excluidor de Emblemas para Roblox",
+ "description": "O nome da extensão"
+ },
+ "appDesc": {
+ "message": "Exclua emblemas indesejados do Roblox do seu inventário em segundo plano.",
+ "description": "A descrição da extensão"
+ },
+ "loadPrompt": {
+ "message": "Carregue todo o seu inventário para começar."
+ },
+ "loadBtn": {
+ "message": "Carregar Inventário"
+ },
+ "loadingInventory": {
+ "message": "Carregando inventário... isso pode levar alguns instantes."
+ },
+ "badgesLoaded": {
+ "message": "Emblemas carregados: "
+ },
+ "phrasePlaceholder": {
+ "message": "Palavra-chave (deixe vazio para TODOS)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Lista de proteção (ex: 'Raro')"
+ },
+ "whitelistTooltip": {
+ "message": "Emblemas com este texto serão desmarcados automaticamente e protegidos da exclusão."
+ },
+ "deleteSelected": {
+ "message": "Excluir Selecionados"
+ },
+ "confirmTitle": {
+ "message": "Tem certeza de que deseja excluir permanentemente emblemas?"
+ },
+ "cancelBtn": {
+ "message": "Cancelar"
+ },
+ "deletingTitle": {
+ "message": "Excluindo Emblemas em Segundo Plano"
+ },
+ "deletingSafeToClose": {
+ "message": "Você pode fechar esta janela com segurança ou acompanhar aqui."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Atualize a página do Roblox para ver as alterações!"
+ },
+ "feedback": {
+ "message": "Feedback"
+ },
+ "donate": {
+ "message": "Doar"
+ }
+}

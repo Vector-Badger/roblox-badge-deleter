@@ -11,6 +11,30 @@ const inventoryStats = document.getElementById('inventoryStats');
 const matchCount = document.getElementById('matchCount');
 const deleteBtn = document.getElementById('deleteBtn');
 const badgeListContainer = document.getElementById('badgeList');
+const stepDeleting = document.getElementById('step-deleting');
+const deletionProgressBar = document.getElementById('deletionProgressBar');
+const deletionCountText = document.getElementById('deletionCountText');
+const deletionFailedText = document.getElementById('deletionFailedText');
+const feedbackLink = document.getElementById('feedbackLink');
+function localizeUI() {
+  if (typeof chrome === 'undefined' || !chrome.i18n || !chrome.i18n.getMessage) return;
+  try {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const msg = chrome.i18n.getMessage(el.getAttribute('data-i18n'));
+      if (msg) el.textContent = msg;
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const msg = chrome.i18n.getMessage(el.getAttribute('data-i18n-placeholder'));
+      if (msg) el.placeholder = msg;
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const msg = chrome.i18n.getMessage(el.getAttribute('data-i18n-title'));
+      if (msg) el.title = msg;
+    });
+  } catch (e) {}
+}
+
+localizeUI();
 
 let selectedCount = 0;
 
@@ -100,10 +124,13 @@ loadBtn.addEventListener('click', () => {
 
 function matchesQuery(badge, query) {
   if (!query) return false;
-  const bName = badge.name ? badge.name.toLowerCase() : '';
-  const bDesc = badge.description ? badge.description.toLowerCase() : '';
-  const bAwarder = (badge.awarder && badge.awarder.name) ? badge.awarder.name.toLowerCase() : '';
-  return bName.includes(query) || bDesc.includes(query) || bAwarder.includes(query);
+  if (badge._searchText === undefined) {
+    const bName = badge.name ? badge.name.toLowerCase() : '';
+    const bDesc = badge.description ? badge.description.toLowerCase() : '';
+    const bAwarder = (badge.awarder && badge.awarder.name) ? badge.awarder.name.toLowerCase() : '';
+    badge._searchText = `${bName}\0${bDesc}\0${bAwarder}`;
+  }
+  return badge._searchText.includes(query);
 }
 
 function applyFilters() {
@@ -140,6 +167,18 @@ if (popOutLink) {
   popOutLink.previousElementSibling.style.display = 'none'; // hide the dot
 }
 
+if (feedbackLink) {
+  feedbackLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    const feedbackUrl = 'https://github.com/Vector-Badger/roblox-badge-deleter/issues';
+    if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.create) {
+      chrome.tabs.create({ url: feedbackUrl });
+    } else {
+      window.open(feedbackUrl, '_blank');
+    }
+  });
+}
+
 let badgesToDeleteCache = [];
 
 deleteBtn.addEventListener('click', () => {
@@ -148,6 +187,8 @@ deleteBtn.addEventListener('click', () => {
 
   badgesToDeleteCache = toDelete;
   confirmCount.textContent = toDelete.length;
+  cancelDeleteBtn.disabled = false;
+  confirmDeleteBtn.disabled = false;
   
   stepFilter.style.display = 'none';
   stepConfirm.style.display = 'flex';
@@ -161,19 +202,44 @@ cancelDeleteBtn.addEventListener('click', () => {
   setStatus('');
 });
 
+function renderCompletionStatus(deleted, failed, lastError, zeroDeleteFallback) {
+  if (stepDeleting) stepDeleting.style.display = 'none';
+  if (stepLoad) stepLoad.style.display = 'flex';
+  if (deleted === 0 && failed > 0) {
+    setStatus(`Deletion failed (${failed} failed). Error: ${lastError || zeroDeleteFallback}`, '#F68802');
+    return;
+  }
+  const finishedHeader = (typeof chrome !== 'undefined' && chrome.i18n && chrome.i18n.getMessage('finishedDeletingBadges')) || '✓ FINISHED DELETING BADGES ✓';
+  const errorDetail = (failed > 0 && lastError) ? `\n(${lastError})` : '';
+  setStatus(`${finishedHeader}\n${deleted} deleted, ${failed} failed. (Refresh Roblox page to see changes!)${errorDetail}`, '#00B06F');
+}
+
 function pollDeletionStatus() {
   if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.sendMessage) return;
   chrome.runtime.sendMessage({ action: 'get_deletion_status' }, (st) => {
     if (chrome.runtime.lastError || !st) return;
     if (st.isRunning || st.active) {
-      setStatus(`Deleting in background: ${st.deleted}/${st.total} deleted (${st.failed} failed)... Safe to close popup!`, '#00B06F');
-      setTimeout(pollDeletionStatus, 500);
-    } else if (st.total > 0) {
-      if (st.deleted === 0 && st.failed > 0) {
-        setStatus(`Deletion failed (${st.failed}/${st.total}). Error: ${st.lastError || 'Check site access permissions in chrome://extensions'}`, '#F68802');
-      } else {
-        setStatus(`Deletion complete! ${st.deleted} deleted, ${st.failed} failed. (Refresh Roblox page to see changes!)`, '#00B06F');
+      if (stepLoad) stepLoad.style.display = 'none';
+      if (stepFilter) stepFilter.style.display = 'none';
+      if (stepConfirm) stepConfirm.style.display = 'none';
+      if (stepDeleting) stepDeleting.style.display = 'flex';
+
+      const total = st.total || 1;
+      const progressPct = Math.min(100, Math.round(((st.deleted + st.failed) / total) * 100));
+      if (deletionProgressBar) deletionProgressBar.style.width = `${progressPct}%`;
+      if (deletionCountText) deletionCountText.textContent = `${st.deleted} / ${total} deleted (${progressPct}%)`;
+      if (deletionFailedText) {
+        if (st.failed > 0) {
+          deletionFailedText.style.display = 'inline';
+          deletionFailedText.textContent = `${st.failed} failed`;
+        } else {
+          deletionFailedText.style.display = 'none';
+        }
       }
+      setStatus(st.statusMessage || `Deleting in background... Safe to close popup!`, st.statusMessage ? '#F68802' : '#00B06F');
+      setTimeout(pollDeletionStatus, 400);
+    } else if (st.total > 0) {
+      renderCompletionStatus(st.deleted, st.failed, st.lastError, 'Check site access permissions in chrome://extensions');
     }
   });
 }
@@ -194,20 +260,18 @@ confirmDeleteBtn.addEventListener('click', () => {
   chrome.runtime.sendMessage({ action: 'start_mass_deletion', badgesToDelete: badgeIds }, (res) => {
     if (chrome.runtime.lastError) return;
     if (res && res.status === 'completed') {
-      if (res.deleted === 0 && res.failed > 0) {
-        setStatus(`Deletion failed (${res.failed} failed). Error: ${res.lastError || 'Ensure site access is ON for *.roblox.com'}`, '#F68802');
-      } else {
-        setStatus(`Deletion complete! ${res.deleted} deleted, ${res.failed} failed. (Refresh Roblox page to see changes!)`, '#00B06F');
-      }
+      renderCompletionStatus(res.deleted, res.failed, res.lastError, 'Ensure site access is ON for *.roblox.com');
     }
   });
 
-  setStatus(`Deletion started (0/${badgeIds.length})! Watch the extension icon badge or close this popup safely.`, '#00B06F');
-  setTimeout(pollDeletionStatus, 400);
-  
-  // Clean up UI so they know it's handled
   badgeListContainer.innerHTML = '';
   stepConfirm.style.display = 'none';
+  if (stepDeleting) stepDeleting.style.display = 'flex';
+  if (deletionProgressBar) deletionProgressBar.style.width = '0%';
+  if (deletionCountText) deletionCountText.textContent = `0 / ${badgeIds.length} deleted (0%)`;
+  if (deletionFailedText) deletionFailedText.style.display = 'none';
+  setStatus(`Deletion started! Safe to close this popup or leave it open to watch.`, '#00B06F');
+  setTimeout(pollDeletionStatus, 400);
 });
 
 if (typeof module !== 'undefined' && module.exports) {

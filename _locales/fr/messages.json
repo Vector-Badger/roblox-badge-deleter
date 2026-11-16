@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Suppresseur de badges pour Roblox"
+ },
+ "appDesc": {
+ "message": "Supprimez les badges Roblox indésirables en arrière-plan."
+ },
+ "loadPrompt": {
+ "message": "Chargez votre inventaire pour commencer."
+ },
+ "loadBtn": {
+ "message": "Charger l'inventaire"
+ },
+ "loadingInventory": {
+ "message": "Chargement de l'inventaire... veuillez patienter."
+ },
+ "badgesLoaded": {
+ "message": "Badges chargés : "
+ },
+ "phrasePlaceholder": {
+ "message": "Terme recherché (laisser vide pour TOUT)"
+ },
+ "whitelistPlaceholder": {
+ "message": "Terme protégé (ex. \"Rare\")"
+ },
+ "whitelistTooltip": {
+ "message": "Les badges correspondants seront protégés de la suppression."
+ },
+ "deleteSelected": {
+ "message": "Supprimer la sélection"
+ },
+ "confirmTitle": {
+ "message": "Voulez-vous vraiment supprimer définitivement badges ?"
+ },
+ "cancelBtn": {
+ "message": "Annuler"
+ },
+ "deletingTitle": {
+ "message": "Suppression des badges en arrière-plan"
+ },
+ "deletingSafeToClose": {
+ "message": "Vous pouvez fermer cette fenêtre ou la laisser ouverte."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Actualisez la page Roblox pour voir les changements !"
+ },
+ "feedback": {
+ "message": "Commentaires"
+ },
+ "donate": {
+ "message": "Faire un don"
+ }
+}

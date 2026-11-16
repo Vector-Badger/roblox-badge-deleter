@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Roblox用バッジ削除ツール"
+ },
+ "appDesc": {
+ "message": "不要なRobloxバッジをバックグラウンドでインベントリから削除します。"
+ },
+ "loadPrompt": {
+ "message": "開始するにはインベントリを読み込んでください。"
+ },
+ "loadBtn": {
+ "message": "インベントリを読み込む"
+ },
+ "loadingInventory": {
+ "message": "インベントリを読み込み中..."
+ },
+ "badgesLoaded": {
+ "message": "読み込み完了バッジ: "
+ },
+ "phrasePlaceholder": {
+ "message": "対象キーワード（すべて選択は空欄）"
+ },
+ "whitelistPlaceholder": {
+ "message": "保護キーワード（例: レア）"
+ },
+ "whitelistTooltip": {
+ "message": "一致するバッジは自動的に保護され削除されません。"
+ },
+ "deleteSelected": {
+ "message": "選択項目を削除"
+ },
+ "confirmTitle": {
+ "message": "本当に 個のバッジを完全に削除しますか？"
+ },
+ "cancelBtn": {
+ "message": "キャンセル"
+ },
+ "deletingTitle": {
+ "message": "バックグラウンドでバッジを削除中"
+ },
+ "deletingSafeToClose": {
+ "message": "このポップアップを閉じても処理は続行されます。"
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Robloxページを再読み込みして変更を確認してください。"
+ },
+ "feedback": {
+ "message": "フィードバック"
+ },
+ "donate": {
+ "message": "寄付"
+ }
+}

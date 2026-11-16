@@ -6,13 +6,13 @@ An elegant, open-source instrument to effortlessly mass-delete unwanted Roblox b
 - **Mass Deletion:** Delete hundreds of badges with a single click.
 - **Smart Targeting:** Filter your inventory by typing specific keywords.
 - **Whitelist Protection:** Protect badges from deletion by typing a whitelist phrase.
-- **Background Mode:** Click the "Pop Out Tab" button to run the deletion infinitely in the background while you play!
+- **Background Execution:** Safe to close the popup while deleting; progress persists automatically with adaptive rate-limit recovery.
 
 ## Security
 This extension is completely safe and open-source. It does not require any dangerous permissions, and it does not access or read your `.ROBLOSECURITY` cookie. All API calls are made securely through your active browser session.
 
 ## Installation
-Available on the Chrome Web Store! (Link coming soon)
+Available on the Chrome Web Store and Firefox Add-ons.
 
 ## Credits
 - Developed by **Badger Dev**

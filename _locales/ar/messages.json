@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "أداة حذف شارات روبلوكس"
+ },
+ "appDesc": {
+ "message": "احذف شارات روبلوكس غير المرغوب فيها من مخزونك في الخلفية."
+ },
+ "loadPrompt": {
+ "message": "قم بتحميل مخزونك بالكامل للبدء."
+ },
+ "loadBtn": {
+ "message": "تحميل المخزون"
+ },
+ "loadingInventory": {
+ "message": "جاري تحميل المخزون... يرجى الانتظار."
+ },
+ "badgesLoaded": {
+ "message": "تم تحميل الشارات: "
+ },
+ "phrasePlaceholder": {
+ "message": "كلمة البحث (اتركها فارغة لتحديد الكل)"
+ },
+ "whitelistPlaceholder": {
+ "message": "كلمة الحماية (مثال: 'نادر')"
+ },
+ "whitelistTooltip": {
+ "message": "الشارات المطابقة سيتم حمايتها تلقائياً من الحذف."
+ },
+ "deleteSelected": {
+ "message": "حذف المحدد"
+ },
+ "confirmTitle": {
+ "message": "هل أنت متأكد من رغبتك في حذف شارة نهائياً؟"
+ },
+ "cancelBtn": {
+ "message": "إلغاء"
+ },
+ "deletingTitle": {
+ "message": "جاري حذف الشارات في الخلفية"
+ },
+ "deletingSafeToClose": {
+ "message": "يمكنك إغلاق هذه النافذة بأمان."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "قم بتحديث صفحة روبلوكس لرؤية التغييرات!"
+ },
+ "feedback": {
+ "message": "تعليقات"
+ },
+ "donate": {
+ "message": "تبرع"
+ }
+}

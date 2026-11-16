@@ -1,0 +1,56 @@
+{
+ "appName": {
+ "message": "Roblox 뱃지 삭제기"
+ },
+ "appDesc": {
+ "message": "인벤토리에서 불필요한 Roblox 뱃지를 백그라운드에서 삭제합니다."
+ },
+ "loadPrompt": {
+ "message": "시작하려면 전체 인벤토리를 불러오세요."
+ },
+ "loadBtn": {
+ "message": "인벤토리 불러오기"
+ },
+ "loadingInventory": {
+ "message": "인벤토리를 불러오는 중..."
+ },
+ "badgesLoaded": {
+ "message": "불러온 뱃지: "
+ },
+ "phrasePlaceholder": {
+ "message": "검색어 (전체 선택 시 비워두기)"
+ },
+ "whitelistPlaceholder": {
+ "message": "보호할 단어 (예: 희귀)"
+ },
+ "whitelistTooltip": {
+ "message": "일치하는 뱃지는 자동으로 선택 해제되어 보호됩니다."
+ },
+ "deleteSelected": {
+ "message": "선택 항목 삭제"
+ },
+ "confirmTitle": {
+ "message": "정말로 개의 뱃지를 영구 삭제하시겠습니까?"
+ },
+ "cancelBtn": {
+ "message": "취소"
+ },
+ "deletingTitle": {
+ "message": "백그라운드에서 뱃지 삭제 중"
+ },
+ "deletingSafeToClose": {
+ "message": "이 창을 닫아도 삭제는 정상 진행됩니다."
+ },
+ "finishedDeletingBadges": {
+ "message": "✓ FINISHED DELETING BADGES ✓"
+ },
+ "refreshRoblox": {
+ "message": "Roblox 페이지를 새로고침하여 변경사항을 확인하세요!"
+ },
+ "feedback": {
+ "message": "피드백"
+ },
+ "donate": {
+ "message": "후원"
+ }
+}

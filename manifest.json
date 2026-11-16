@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Background Badge Deleter for Roblox",
-  "version": "1.43.1",
-  "description": "An elegant instrument to effortlessly delete unwanted Roblox badges from your inventory.",
+  "default_locale": "en",
+  "name": "__MSG_appName__",
+  "version": "1.44.0",
+  "description": "__MSG_appDesc__",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
