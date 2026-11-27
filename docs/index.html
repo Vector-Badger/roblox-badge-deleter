@@ -1089,6 +1089,46 @@
       margin-bottom: 2px;
     }
 
+    .fake-404-toast.info-toast {
+      border-color: rgba(59, 130, 246, 0.85);
+      border-left-color: #2563eb;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 22px rgba(37, 99, 235, 0.38);
+    }
+
+    .fake-404-toast.info-toast .toast-body strong {
+      color: #93c5fd;
+    }
+
+    .toast-i-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #2563eb;
+      color: #ffffff;
+      font-family: Georgia, "Times New Roman", serif;
+      font-style: italic;
+      font-weight: 900;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+
+    .toast-details-link {
+      display: inline-block;
+      margin-top: 5px;
+      color: #93c5fd;
+      font-size: 12px;
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    .toast-details-link:hover {
+      color: #dbeafe;
+    }
+
     .toast-close {
       background: transparent;
       border: none;
@@ -1468,15 +1508,28 @@
         if (stack.children.length >= MAX_TOASTS) {
           stack.firstElementChild.remove();
         }
+        const isTooPoor = Math.random() < 0.2;
         const toast = document.createElement('div');
-        toast.className = 'fake-404-toast';
-        toast.innerHTML =
-          '<div class="toast-x-icon" aria-hidden="true">&#10005;</div>' +
-          '<div class="toast-body">' +
-            '<strong>404 not found</strong>' +
-            '<span>waiting the customer serivce, ETA: an eternity</span>' +
-          '</div>' +
-          '<button type="button" class="toast-close" aria-label="Dismiss">&times;</button>';
+        toast.className = isTooPoor ? 'fake-404-toast info-toast' : 'fake-404-toast';
+
+        if (isTooPoor) {
+          toast.innerHTML =
+            '<div class="toast-i-icon" aria-hidden="true">i</div>' +
+            '<div class="toast-body">' +
+              '<strong>Info</strong>' +
+              '<span>Ur too poor lmao to buy this</span>' +
+            '</div>' +
+            '<button type="button" class="toast-close" aria-label="Dismiss">&times;</button>';
+        } else {
+          toast.innerHTML =
+            '<div class="toast-x-icon" aria-hidden="true">&#10005;</div>' +
+            '<div class="toast-body">' +
+              '<strong>404 not found</strong>' +
+              '<span>waiting the customer serivce, ETA: an eternity</span><br>' +
+              '<a class="toast-details-link" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" rel="noopener noreferrer">Click here for details</a>' +
+            '</div>' +
+            '<button type="button" class="toast-close" aria-label="Dismiss">&times;</button>';
+        }
 
         toast.querySelector('.toast-close').addEventListener('click', function () {
           toast.remove();
