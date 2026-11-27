@@ -319,6 +319,191 @@
       transform: scale(1.06) rotate(-1deg);
     }
 
+    .pricing-section {
+      margin-top: 34px;
+    }
+
+    .pricing-header {
+      text-align: center;
+      margin-bottom: 18px;
+    }
+
+    .pricing-header h2 {
+      margin: 0 0 6px;
+      font-size: 26px;
+      color: #0f172a;
+    }
+
+    .pricing-header p {
+      margin: 0;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .price-card {
+      background: #ffffff;
+      border: 2px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .price-card.enterprise {
+      border: 3px solid #eab308;
+      background: linear-gradient(180deg, #fffbeb 0%, #ffffff 42%);
+      position: relative;
+      box-shadow: 0 10px 26px rgba(234, 179, 8, 0.22);
+    }
+
+    .price-ribbon {
+      position: absolute;
+      top: -13px;
+      right: 16px;
+      background: #dc2626;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .price-card h3 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      color: #0f172a;
+    }
+
+    .price-amount {
+      font-size: clamp(26px, 4vw, 34px);
+      font-weight: 900;
+      color: #0f172a;
+      margin: 6px 0 4px;
+      word-break: break-all;
+    }
+
+    .price-sub {
+      font-size: 12px;
+      color: #64748b;
+      margin: 0 0 16px;
+    }
+
+    .price-card ul {
+      margin: 0 0 20px;
+      padding-left: 20px;
+      color: #334155;
+      flex: 1;
+    }
+
+    .price-card li {
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    .btn-enterprise {
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      background: linear-gradient(90deg, #eab308, #f97316);
+      border: 2px solid #b45309;
+      color: #ffffff;
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 800;
+      transition: transform 0.15s ease;
+    }
+
+    .btn-enterprise:hover {
+      transform: scale(1.04) rotate(0.8deg);
+    }
+
+    .pricing-note {
+      text-align: center;
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 12px;
+    }
+
+    @keyframes toastPopIn {
+      0% { opacity: 0; transform: translateY(30px) scale(0.92); }
+      60% { opacity: 1; transform: translateY(-4px) scale(1.02); }
+      75% { transform: translateX(-6px); }
+      88% { transform: translateX(5px); }
+      100% { opacity: 1; transform: translate(0, 0) scale(1); }
+    }
+
+    .toast-404 {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 9999;
+      display: none;
+      align-items: flex-start;
+      gap: 12px;
+      max-width: 340px;
+      background: #18181b;
+      color: #f4f4f5;
+      border: 2px solid #ef4444;
+      border-left: 6px solid #ef4444;
+      border-radius: 8px;
+      padding: 14px 16px;
+      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+      font-size: 13px;
+    }
+
+    .toast-404.show {
+      display: flex;
+      animation: toastPopIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .toast-icon {
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #ef4444;
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .toast-body strong {
+      display: block;
+      color: #fca5a5;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .toast-close {
+      background: transparent;
+      border: none;
+      color: #a1a1aa;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 2px;
+      margin-left: auto;
+    }
+
+    .toast-close:hover {
+      color: #ffffff;
+    }
+
     footer {
       max-width: 960px;
       margin: 24px auto 48px;
@@ -406,11 +591,87 @@
         <a class="btn" href="./privacy.html">Privacy Policy</a>
       </div>
     </article>
+
+    <section class="pricing-section" aria-label="Pricing Tiers">
+      <div class="pricing-header">
+        <h2>Simple, Transparent Pricing</h2>
+        <p>Choose the plan that best aligns with your digital transformation journey.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="price-card">
+          <h3>Normal Human</h3>
+          <div class="price-amount">$0</div>
+          <p class="price-sub">Forever · Free &amp; Open Source</p>
+          <ul>
+            <li>The actual entire extension</li>
+            <li>Zero invasive permissions</li>
+            <li>20 languages &amp; adaptive rate-limit recovery</li>
+            <li>No subscriptions, no paywalls, no nonsense</li>
+          </ul>
+          <a class="btn btn-primary" style="text-align:center;" href="https://github.com/Vector-Badger/roblox-badge-deleter">Use It For Free</a>
+        </div>
+
+        <div class="price-card enterprise">
+          <div class="price-ribbon">Most Compartmentalized</div>
+          <h3>Enterprise Synergy Ultra</h3>
+          <div class="price-amount">9999999999$</div>
+          <p class="price-sub">Billed whenever · Does literally nothing</p>
+          <ul>
+            <li>Extra bloat</li>
+            <li>Enterprise synergic streamlined low hanging fruit badge fetch and sanitization prior removal</li>
+            <li>I'm the capitalism incarnate</li>
+            <li>I made the fees (fees apply)</li>
+            <li>Bruh</li>
+          </ul>
+          <button type="button" id="enterpriseBtn" class="btn-enterprise">Upgrade to 9999999999$</button>
+        </div>
+      </div>
+
+      <p class="pricing-note">*Parody pricing tier for laughs only. Badge Deleter for Roblox is 100% free and open-source with zero paid plans.</p>
+    </section>
   </main>
+
+  <div id="toast404" class="toast-404" role="alert" aria-live="polite">
+    <div class="toast-icon" aria-hidden="true">✕</div>
+    <div class="toast-body">
+      <strong>404 Not Found</strong>
+      <span>Billing microservice is too compartmentalized to process your 9999999999$.</span>
+    </div>
+    <button type="button" id="toastCloseBtn" class="toast-close" aria-label="Dismiss error">&times;</button>
+  </div>
 
   <footer>
     <p>&copy; 2026 Badger Dev · MIT License · <a href="./privacy.html">Privacy Policy</a></p>
     <p>Independent open-source utility. Not affiliated with, endorsed by, or sponsored by Roblox Corporation.</p>
   </footer>
+
+  <script>
+    (function () {
+      const btn = document.getElementById('enterpriseBtn');
+      const toast = document.getElementById('toast404');
+      const closeBtn = document.getElementById('toastCloseBtn');
+      let hideTimer = null;
+
+      function hideToast() {
+        toast.classList.remove('show');
+        if (hideTimer) clearTimeout(hideTimer);
+      }
+
+      if (btn && toast) {
+        btn.addEventListener('click', function () {
+          toast.classList.remove('show');
+          void toast.offsetWidth;
+          toast.classList.add('show');
+          if (hideTimer) clearTimeout(hideTimer);
+          hideTimer = setTimeout(hideToast, 4500);
+        });
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener('click', hideToast);
+      }
+    })();
+  </script>
 </body>
 </html>
