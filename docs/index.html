@@ -969,6 +969,75 @@
       color: rgba(203, 213, 225, 0.65);
     }
 
+    .ai-reviews-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 18px;
+      margin-top: 26px;
+      text-align: left;
+    }
+
+    .ai-review-card {
+      padding: 20px;
+      border-radius: 18px;
+      background: rgba(15, 23, 42, 0.46);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      backdrop-filter: blur(28px) saturate(210%);
+      -webkit-backdrop-filter: blur(28px) saturate(210%);
+      box-shadow: 0 12px 32px rgba(2, 8, 28, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: transform 0.2s ease, border-color 0.25s ease;
+    }
+
+    .ai-review-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(125, 211, 252, 0.6);
+    }
+
+    .ai-review-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.35);
+    }
+
+    .default-two-ball-avatar {
+      flex-shrink: 0;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(203, 213, 225, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .ai-reviewer-meta strong {
+      display: block;
+      font-size: 14px;
+      color: #ffffff;
+    }
+
+    .ai-reviewer-meta span {
+      display: block;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .ai-review-text {
+      margin: 0;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #e2e8f0;
+    }
+
     /* Fake 404 bottom-right toast */
     .toast-stack {
       position: fixed;
@@ -1188,6 +1257,65 @@
             <span class="tiny-help">(uhhh help)</span>
           </blockquote>
           <span class="quote-orb q-close" aria-hidden="true">&rdquo;</span>
+        </div>
+
+        <div class="ai-reviews-grid">
+          <article class="ai-review-card">
+            <div class="ai-review-header">
+              <div class="default-two-ball-avatar" aria-hidden="true">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <circle cx="18" cy="11" r="6" fill="#cbd5e1"/>
+                  <line x1="6" y1="19.5" x2="30" y2="19.5" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
+                  <circle cx="18" cy="30" r="9" fill="#cbd5e1"/>
+                </svg>
+              </div>
+              <div class="ai-reviewer-meta">
+                <strong>John Doe</strong>
+                <span>Verified Real Human #001</span>
+              </div>
+            </div>
+            <p class="ai-review-text">
+              "In today's fast-paced digital landscape, Badge Deleter delves into a rich tapestry of inventory optimization. Moreover, it serves as a testament to synergy &mdash; not merely removing badges, but fostering a holistic paradigm shift."
+            </p>
+          </article>
+
+          <article class="ai-review-card">
+            <div class="ai-review-header">
+              <div class="default-two-ball-avatar" aria-hidden="true">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <circle cx="18" cy="11" r="6" fill="#cbd5e1"/>
+                  <line x1="6" y1="19.5" x2="30" y2="19.5" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
+                  <circle cx="18" cy="30" r="9" fill="#cbd5e1"/>
+                </svg>
+              </div>
+              <div class="ai-reviewer-meta">
+                <strong>Bob Fakename</strong>
+                <span>Upgraded from Free to Paid</span>
+              </div>
+            </div>
+            <p class="ai-review-text">
+              "My life changed from the free to the free from my badge roblox bed, now i can finally sleep on the floor in peace every night!"
+            </p>
+          </article>
+
+          <article class="ai-review-card">
+            <div class="ai-review-header">
+              <div class="default-two-ball-avatar" aria-hidden="true">
+                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <circle cx="18" cy="11" r="6" fill="#cbd5e1"/>
+                  <line x1="6" y1="19.5" x2="30" y2="19.5" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
+                  <circle cx="18" cy="30" r="9" fill="#cbd5e1"/>
+                </svg>
+              </div>
+              <div class="ai-reviewer-meta">
+                <strong>Jane Customer_v2_FINAL</strong>
+                <span>Chief Officer at [INSERT_COMPANY]</span>
+              </div>
+            </div>
+            <p class="ai-review-text">
+              "Certainly! Here is a natural, human-sounding 5-star review: I was skeptical at first &mdash; however, paying 9,999,999,999 hourly elevated my workflow! Let me know if you would like a more casual tone."
+            </p>
+          </article>
         </div>
       </div>
     </section>
