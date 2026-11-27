@@ -58,13 +58,51 @@
       z-index: 0;
       pointer-events: none;
       opacity: 0;
-      transition: opacity 0.65s ease;
-      background: radial-gradient(circle at 50% 50%, #070b1d 0%, #02040a 100%);
+      transition: opacity 0.7s ease;
+      background:
+        radial-gradient(ellipse 90% 80% at 96% 42%, rgba(96, 175, 255, 0.85) 0%, rgba(29, 92, 224, 0.62) 34%, rgba(10, 31, 86, 0.85) 68%, #020614 100%);
       overflow: hidden;
     }
 
     body.plasma-active .global-plasma-stage {
       opacity: 1;
+    }
+
+    .deepmind-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .frontier-monument {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: clamp(280px, 46vw, 560px);
+      font-weight: 800;
+      line-height: 1;
+      color: rgba(186, 224, 255, 0.16);
+      filter: blur(12px) drop-shadow(0 0 60px rgba(96, 175, 255, 0.38));
+      user-select: none;
+      animation: monumentBreathe 7s ease-in-out infinite;
+    }
+
+    @keyframes monumentBreathe {
+      0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(-2deg); opacity: 0.78; }
+      50% { transform: translate(-50%, -52%) scale(1.06) rotate(2deg); opacity: 1; }
+    }
+
+    .plasma-grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.16;
+      mix-blend-mode: overlay;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 0);
+      background-size: 3px 3px;
     }
 
     .plasma-cloud {
@@ -765,32 +803,106 @@
     .testimony-section {
       position: relative;
       z-index: 2;
-      margin-top: 30px;
-      padding-top: 24px;
+      margin-top: 38px;
+      padding: 32px 16px 24px;
       border-top: 1px solid rgba(255, 255, 255, 0.18);
       text-align: center;
     }
 
     .testimony-section h3 {
-      margin: 0 0 14px;
-      font-size: 20px;
+      margin: 0 0 22px;
+      font-size: 21px;
       color: #ffffff;
       font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    @keyframes orbitSpinSlow {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes counterSpinSlow {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(-180deg) scale(1.12); }
+      100% { transform: rotate(-360deg) scale(1); }
+    }
+
+    .testimony-orbit-wrap {
+      position: relative;
+      max-width: 660px;
+      margin: 0 auto;
+      padding: 26px 22px;
+    }
+
+    .cloudy-synergy-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 104%;
+      height: 138%;
+      border-radius: 50%;
+      border: 1px dashed rgba(186, 230, 253, 0.38);
+      box-shadow: 0 0 40px rgba(56, 189, 248, 0.22), inset 0 0 36px rgba(147, 197, 253, 0.16);
+      pointer-events: none;
+      animation: orbitSpinSlow 14s linear infinite;
+    }
+
+    .quote-orb {
+      position: absolute;
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1;
+      color: #e0f2fe;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.34), rgba(56, 189, 248, 0.14) 65%, rgba(15, 23, 42, 0.25));
+      border: 1px solid rgba(255, 255, 255, 0.48);
+      backdrop-filter: blur(24px) saturate(240%);
+      -webkit-backdrop-filter: blur(24px) saturate(240%);
+      box-shadow: 0 8px 28px rgba(14, 165, 233, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.65);
+      text-shadow: 0 0 16px rgba(125, 211, 252, 0.9);
+      animation: counterSpinSlow 14s linear infinite;
+    }
+
+    .quote-orb.q-open {
+      top: -22px;
+      left: 12%;
+    }
+
+    .quote-orb.q-close {
+      bottom: -22px;
+      right: 12%;
     }
 
     .testimony-quote {
-      max-width: 640px;
+      position: relative;
+      z-index: 2;
       margin: 0 auto;
-      padding: 20px 24px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      backdrop-filter: blur(28px) saturate(210%);
-      -webkit-backdrop-filter: blur(28px) saturate(210%);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.32);
-      font-size: 16px;
+      padding: 24px 28px 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(56, 189, 248, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.36);
+      backdrop-filter: blur(34px) saturate(230%);
+      -webkit-backdrop-filter: blur(34px) saturate(230%);
+      box-shadow: 0 18px 46px rgba(2, 8, 28, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      font-size: 17px;
       font-style: italic;
       color: #f8fafc;
+    }
+
+    .tiny-help {
+      display: block;
+      margin-top: 10px;
+      font-size: 10px;
+      font-style: normal;
+      letter-spacing: 0.04em;
+      color: rgba(203, 213, 225, 0.65);
     }
 
     /* Fake 404 bottom-right toast */
@@ -868,10 +980,13 @@
 </head>
 <body>
   <div class="global-plasma-stage" aria-hidden="true">
+    <canvas class="deepmind-canvas" id="deepmindCanvas"></canvas>
+    <div class="frontier-monument">$</div>
     <div class="plasma-cloud c1"></div>
     <div class="plasma-cloud c2"></div>
     <div class="plasma-cloud c3"></div>
     <div class="plasma-cloud c4"></div>
+    <div class="plasma-grain"></div>
   </div>
 
   <header class="topbar">
@@ -978,11 +1093,12 @@
               <h3>Awesome</h3>
               <div class="tier-glass-price">
                 $9,999,999,999
-                <small>/ month</small>
+                <small>/ hourly</small>
               </div>
               <ul>
                 <li>Extra bloat</li>
                 <li>Enterprise synergic streamlined low hanging fruit badge fetch and sanitization prior removal</li>
+                <li>more features (i added one extra line of code)</li>
                 <li>I'm the capitalism incarnate</li>
                 <li>I made the fees (fees apply)</li>
                 <li>Bruh</li>
@@ -995,9 +1111,16 @@
 
       <div class="testimony-section">
         <h3>What our customers <em>say</em>:</h3>
-        <blockquote class="testimony-quote">
-          "99999999999 plan buyer: Yea i got paid, so i'll say it works! (uhhh help)"
-        </blockquote>
+        <div class="testimony-orbit-wrap">
+          <div class="cloudy-synergy-ring" aria-hidden="true">
+            <span class="quote-orb q-open">&ldquo;</span>
+            <span class="quote-orb q-close">&rdquo;</span>
+          </div>
+          <blockquote class="testimony-quote">
+            "99999999999 plan buyer: Yea i got paid, so i'll say it works!"
+            <span class="tiny-help">(uhhh help)</span>
+          </blockquote>
+        </div>
       </div>
     </section>
   </main>
@@ -1013,6 +1136,90 @@
     (function () {
       const arena = document.getElementById('pricingArena');
       const glassCard = document.getElementById('awesomeGlassCard');
+      const canvas = document.getElementById('deepmindCanvas');
+      const ctx = canvas ? canvas.getContext('2d') : null;
+      let plasmaActive = false;
+      let animFrameId = null;
+      let pointerX = -1000;
+      let pointerY = -1000;
+
+      const glyphs = [];
+      const GLYPH_COUNT = 110;
+      const CHARS = ['$', '9', '4', '$', '9'];
+
+      function resizeCanvas() {
+        if (!canvas) return;
+        canvas.width = window.innerWidth || 1280;
+        canvas.height = window.innerHeight || 800;
+      }
+
+      function initGlyphs() {
+        resizeCanvas();
+        glyphs.length = 0;
+        const w = canvas ? canvas.width : 1280;
+        const h = canvas ? canvas.height : 800;
+        for (let i = 0; i < GLYPH_COUNT; i++) {
+          glyphs.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.38,
+            vy: -0.18 - Math.random() * 0.42,
+            alpha: 0.25 + Math.random() * 0.65,
+            size: 9 + Math.floor(Math.random() * 5),
+            ch: CHARS[i % CHARS.length]
+          });
+        }
+      }
+
+      function renderFrontierFrame(ts) {
+        if (!plasmaActive || !ctx || !canvas) {
+          animFrameId = null;
+          return;
+        }
+        const w = canvas.width;
+        const h = canvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        // Sweeping volumetric DeepMind sapphire light beam
+        const beamX = w * (0.78 + Math.sin(ts * 0.0007) * 0.1);
+        const beamY = h * (0.42 + Math.cos(ts * 0.0005) * 0.12);
+        const grad = ctx.createRadialGradient(beamX, beamY, 20, beamX, beamY, Math.max(w, h) * 0.78);
+        grad.addColorStop(0, 'rgba(135, 206, 255, 0.42)');
+        grad.addColorStop(0.38, 'rgba(37, 99, 235, 0.24)');
+        grad.addColorStop(1, 'rgba(2, 6, 20, 0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        ctx.font = '700 11px ui-monospace, SFMono-Regular, Menlo, monospace';
+        for (let i = 0; i < glyphs.length; i++) {
+          const g = glyphs[i];
+          const dx = g.x - pointerX;
+          const dy = g.y - pointerY;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < 19600 && distSq > 1) {
+            const force = (140 - Math.sqrt(distSq)) * 0.015;
+            g.x += (dx / Math.sqrt(distSq)) * force;
+            g.y += (dy / Math.sqrt(distSq)) * force;
+          }
+          g.x += g.vx;
+          g.y += g.vy;
+          if (g.y < -20) g.y = h + 20;
+          if (g.x < -20) g.x = w + 20;
+          if (g.x > w + 20) g.x = -20;
+
+          ctx.fillStyle = 'rgba(224, 242, 254, ' + g.alpha.toFixed(2) + ')';
+          ctx.fillText(g.ch, g.x, g.y);
+        }
+
+        animFrameId = requestAnimationFrame(renderFrontierFrame);
+      }
+
+      window.addEventListener('resize', resizeCanvas, { passive: true });
+      window.addEventListener('mousemove', function (e) {
+        pointerX = e.clientX;
+        pointerY = e.clientY;
+      }, { passive: true });
+      initGlyphs();
 
       function updateScrollGlass() {
         if (!arena || !glassCard) return;
@@ -1022,10 +1229,15 @@
         const progress = Math.max(0, Math.min(1, raw));
         glassCard.style.setProperty('--scroll-p', progress.toFixed(4));
 
-        if (progress > 0.25) {
-          document.body.classList.add('plasma-active');
-        } else {
-          document.body.classList.remove('plasma-active');
+        const shouldActivate = progress > 0.25;
+        if (shouldActivate !== plasmaActive) {
+          plasmaActive = shouldActivate;
+          if (plasmaActive) {
+            document.body.classList.add('plasma-active');
+            if (!animFrameId) animFrameId = requestAnimationFrame(renderFrontierFrame);
+          } else {
+            document.body.classList.remove('plasma-active');
+          }
         }
       }
 
