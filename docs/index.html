@@ -488,30 +488,39 @@
 
     .tier-glass-shell {
       position: relative;
-      border-radius: 16px;
-      padding: 3px;
+      border-radius: 18px;
       overflow: hidden;
-      animation: neonPulse 2.8s ease-in-out infinite;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.05) 45%, rgba(0, 245, 255, 0.14));
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.55),
+        0 0 36px rgba(56, 189, 248, 0.28),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      backdrop-filter: blur(38px) saturate(240%) brightness(1.12);
+      -webkit-backdrop-filter: blur(38px) saturate(240%) brightness(1.12);
+      transform: perspective(900px) translateY(calc((1 - var(--scroll-p, 1)) * 48px)) rotateX(calc((1 - var(--scroll-p, 1)) * 14deg)) scale(calc(0.92 + var(--scroll-p, 1) * 0.08));
+      transition: box-shadow 0.25s ease;
+      will-change: transform, backdrop-filter;
     }
 
-    .tier-glass-shell::before {
+    .tier-glass-shell::after {
       content: "";
       position: absolute;
-      inset: -60%;
-      background: conic-gradient(from 0deg, #00f5ff, #ff00d4, #39ff14, #facc15, #00f5ff);
-      animation: neonSpin 3.4s linear infinite;
+      inset: -40%;
+      background: linear-gradient(115deg, transparent 36%, rgba(255, 255, 255, 0.28) 50%, transparent 64%);
+      transform: translateX(calc((var(--scroll-p, 0.5) - 0.5) * 140%));
+      pointer-events: none;
     }
 
     .tier-glass-inner {
       position: relative;
       z-index: 1;
       height: 100%;
-      border-radius: 13px;
+      border-radius: 17px;
       padding: 26px;
-      background: rgba(12, 18, 36, 0.62);
-      backdrop-filter: blur(24px) saturate(210%);
-      -webkit-backdrop-filter: blur(24px) saturate(210%);
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(10, 16, 32, 0.34);
+      backdrop-filter: blur(28px) saturate(210%);
+      -webkit-backdrop-filter: blur(28px) saturate(210%);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -520,32 +529,33 @@
     .tier-ribbon {
       display: inline-block;
       align-self: flex-start;
-      background: linear-gradient(90deg, #ff00d4, #00f5ff);
-      color: #060913;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #f8fafc;
       font-size: 11px;
-      font-weight: 900;
+      font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       padding: 4px 10px;
       border-radius: 999px;
       margin-bottom: 10px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
 
     .tier-glass-inner h3 {
       margin: 0 0 6px;
-      font-size: 20px;
+      font-size: 24px;
       color: #ffffff;
-      text-shadow: 0 0 12px rgba(255, 0, 212, 0.8);
+      text-shadow: 0 2px 18px rgba(125, 211, 252, 0.65);
     }
 
     .tier-glass-price {
       font-size: clamp(24px, 4vw, 30px);
       font-weight: 900;
       margin: 6px 0 14px;
-      background: linear-gradient(90deg, #00f5ff, #f472b6, #facc15);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
+      color: #ffffff;
+      text-shadow: 0 0 24px rgba(56, 189, 248, 0.55);
       word-break: break-word;
     }
 
@@ -553,30 +563,29 @@
       display: block;
       font-size: 12px;
       color: #cbd5e1;
-      -webkit-text-fill-color: #cbd5e1;
       margin-top: 2px;
     }
 
     .btn-neon {
       width: 100%;
       padding: 13px 18px;
-      border: none;
-      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 10px;
       font-size: 15px;
       font-weight: 900;
-      letter-spacing: 0.03em;
-      color: #060913;
-      background: linear-gradient(90deg, #00f5ff, #39ff14, #ff00d4);
-      background-size: 200% 200%;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.55), rgba(168, 85, 247, 0.55));
+      backdrop-filter: blur(20px) saturate(200%);
+      -webkit-backdrop-filter: blur(20px) saturate(200%);
       cursor: pointer;
-      animation: rainbowShift 3s ease infinite;
-      box-shadow: 0 0 20px rgba(0, 245, 255, 0.55);
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 8px 26px rgba(56, 189, 248, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      transition: transform 0.12s ease, box-shadow 0.15s ease;
     }
 
     .btn-neon:hover {
-      transform: scale(1.04);
-      box-shadow: 0 0 32px rgba(255, 0, 212, 0.85);
+      transform: scale(1.03);
+      box-shadow: 0 10px 36px rgba(168, 85, 247, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.7);
     }
 
     .btn-free-ghost {
@@ -613,14 +622,17 @@
       display: flex;
       align-items: flex-start;
       gap: 12px;
-      background: #18181b;
+      background: rgba(24, 24, 27, 0.72);
       color: #fafafa;
-      border: 1px solid #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.8);
       border-left: 5px solid #dc2626;
-      border-radius: 8px;
+      border-radius: 10px;
       padding: 14px 16px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
-      animation: toastPopIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+      backdrop-filter: blur(28px) saturate(220%);
+      -webkit-backdrop-filter: blur(28px) saturate(220%);
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), 0 0 22px rgba(220, 38, 38, 0.35);
+      filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.35));
+      animation: toastPopIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
     .toast-x-icon {
@@ -739,14 +751,14 @@
       </div>
     </article>
 
-    <section class="pricing-arena" aria-label="Totally Serious Pricing Tiers">
+    <section class="pricing-arena" id="pricingArena" aria-label="Totally Serious Pricing Tiers">
       <div class="neon-orb orb-1" aria-hidden="true"></div>
       <div class="neon-orb orb-2" aria-hidden="true"></div>
       <div class="neon-orb orb-3" aria-hidden="true"></div>
 
       <div class="pricing-header">
-        <h2>Flexible Pricing</h2>
-        <p>Choose the plan that best aligns with your synergistic GPU temperature.</p>
+        <h2>Oh my god! I'm so desperate for money and your attention!</h2>
+        <p>Oooooo shiny UI you should buy</p>
       </div>
 
       <div class="pricing-grid">
@@ -764,11 +776,11 @@
           <a class="btn-free-ghost" href="https://github.com/Vector-Badger/roblox-badge-deleter">Use the Free Version</a>
         </div>
 
-        <div class="tier-glass-shell">
+        <div class="tier-glass-shell" id="awesomeGlassCard">
           <div class="tier-glass-inner">
             <div>
-              <span class="tier-ribbon">Most Popular · Enterprise AI Glass</span>
-              <h3>Ultra Hyper-Synergy</h3>
+              <span class="tier-ribbon">Most Popular · Frosted Glass</span>
+              <h3>Awesome</h3>
               <div class="tier-glass-price">
                 $9,999,999,999
                 <small>/ month (parody tier — does literally nothing)</small>
@@ -797,18 +809,54 @@
 
   <script>
     (function () {
+      const arena = document.getElementById('pricingArena');
+      const glassCard = document.getElementById('awesomeGlassCard');
+      const orbs = arena ? arena.querySelectorAll('.neon-orb') : [];
+
+      function updateScrollGlass() {
+        if (!arena || !glassCard) return;
+        const rect = arena.getBoundingClientRect();
+        const vh = window.innerHeight || 800;
+        const raw = (vh - rect.top) / (vh * 0.72);
+        const progress = Math.max(0, Math.min(1, raw));
+        glassCard.style.setProperty('--scroll-p', progress.toFixed(4));
+        orbs.forEach(function (orb, idx) {
+          const shift = (progress - 0.5) * (idx % 2 === 0 ? 90 : -90);
+          orb.style.transform = 'translate3d(' + shift.toFixed(1) + 'px, ' + (shift * -0.45).toFixed(1) + 'px, 0) scale(' + (0.95 + progress * 0.25).toFixed(3) + ')';
+        });
+      }
+
+      let ticking = false;
+      window.addEventListener('scroll', function () {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(function () {
+            updateScrollGlass();
+            ticking = false;
+          });
+        }
+      }, { passive: true });
+      updateScrollGlass();
+
       const btn = document.getElementById('enterpriseBtn');
       const stack = document.getElementById('toastStack');
       if (!btn || !stack) return;
 
-      btn.addEventListener('click', function () {
+      let rapidStreak = 0;
+      let lastClickAt = 0;
+      const MAX_TOASTS = 90;
+
+      function spawnToast() {
+        if (stack.children.length >= MAX_TOASTS) {
+          stack.firstElementChild.remove();
+        }
         const toast = document.createElement('div');
         toast.className = 'fake-404-toast';
         toast.innerHTML =
           '<div class="toast-x-icon" aria-hidden="true">&#10005;</div>' +
           '<div class="toast-body">' +
-            '<strong>404 Not Found</strong>' +
-            '<span>Enterprise checkout microservice could not be found (compartmentalized).</span>' +
+            '<strong>404 not found</strong>' +
+            '<span>waiting the customer serivce, ETA: an eternity</span>' +
           '</div>' +
           '<button type="button" class="toast-close" aria-label="Dismiss">&times;</button>';
 
@@ -819,7 +867,22 @@
         stack.appendChild(toast);
         setTimeout(function () {
           if (toast.parentNode) toast.remove();
-        }, 5000);
+        }, 6500);
+      }
+
+      btn.addEventListener('click', function () {
+        const now = Date.now();
+        if (now - lastClickAt < 700) {
+          rapidStreak = Math.min(rapidStreak + 1, 6);
+        } else {
+          rapidStreak = 1;
+        }
+        lastClickAt = now;
+
+        const burst = Math.min(24, Math.pow(2, rapidStreak - 1));
+        for (let i = 0; i < burst; i++) {
+          spawnToast();
+        }
       });
     })();
   </script>
