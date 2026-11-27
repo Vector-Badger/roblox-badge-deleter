@@ -319,167 +319,329 @@
       transform: scale(1.06) rotate(-1deg);
     }
 
-    .pricing-section {
-      margin-top: 34px;
+    footer {
+      max-width: 960px;
+      margin: 24px auto 48px;
+      padding: 0 20px;
+      font-size: 13px;
+      color: #64748b;
+      text-align: center;
+    }
+
+    footer a {
+      color: #334155;
+      font-weight: 600;
+    }
+
+    /* GPU-melting neon glassmorphism pricing arena */
+    @keyframes orbFloatA {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(65px, -45px) scale(1.22); }
+    }
+
+    @keyframes orbFloatB {
+      0%, 100% { transform: translate(0, 0) scale(1.1); }
+      50% { transform: translate(-70px, 50px) scale(0.85); }
+    }
+
+    @keyframes neonSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes neonPulse {
+      0%, 100% {
+        box-shadow: 0 0 18px rgba(0, 245, 255, 0.45), 0 0 42px rgba(255, 0, 212, 0.35), inset 0 0 18px rgba(255, 255, 255, 0.14);
+      }
+      50% {
+        box-shadow: 0 0 32px rgba(0, 245, 255, 0.8), 0 0 68px rgba(255, 0, 212, 0.6), inset 0 0 26px rgba(255, 255, 255, 0.24);
+      }
+    }
+
+    @keyframes toastPopIn {
+      0% { opacity: 0; transform: translateY(36px) scale(0.88); }
+      65% { opacity: 1; transform: translateY(-6px) scale(1.03); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .pricing-arena {
+      position: relative;
+      overflow: hidden;
+      background: #060913;
+      border: 2px solid #1e293b;
+      border-radius: 14px;
+      padding: 40px 28px;
+      margin: 34px 0 28px;
+      color: #f8fafc;
+      box-shadow: 0 18px 44px rgba(2, 6, 23, 0.45);
+    }
+
+    .neon-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(56px);
+      opacity: 0.65;
+      pointer-events: none;
+    }
+
+    .neon-orb.orb-1 {
+      width: 280px;
+      height: 280px;
+      background: #ff00d4;
+      top: -60px;
+      right: -40px;
+      animation: orbFloatA 6s ease-in-out infinite;
+    }
+
+    .neon-orb.orb-2 {
+      width: 300px;
+      height: 300px;
+      background: #00f5ff;
+      bottom: -80px;
+      left: -40px;
+      animation: orbFloatB 7.5s ease-in-out infinite;
+    }
+
+    .neon-orb.orb-3 {
+      width: 220px;
+      height: 220px;
+      background: #39ff14;
+      top: 40%;
+      left: 46%;
+      animation: orbFloatA 5.2s ease-in-out infinite reverse;
     }
 
     .pricing-header {
+      position: relative;
+      z-index: 2;
       text-align: center;
-      margin-bottom: 18px;
+      margin-bottom: 28px;
     }
 
     .pricing-header h2 {
       margin: 0 0 6px;
-      font-size: 26px;
-      color: #0f172a;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      text-shadow: 0 0 18px rgba(0, 245, 255, 0.65);
     }
 
     .pricing-header p {
       margin: 0;
+      color: #cbd5e1;
       font-size: 14px;
-      color: #475569;
     }
 
     .pricing-grid {
+      position: relative;
+      z-index: 2;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
       align-items: stretch;
     }
 
-    .price-card {
-      background: #ffffff;
-      border: 2px solid #cbd5e1;
-      border-radius: 10px;
+    .tier-free {
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 14px;
       padding: 26px;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+      justify-content: space-between;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
-    .price-card.enterprise {
-      border: 3px solid #eab308;
-      background: linear-gradient(180deg, #fffbeb 0%, #ffffff 42%);
-      position: relative;
-      box-shadow: 0 10px 26px rgba(234, 179, 8, 0.22);
+    .tier-free h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: #e2e8f0;
     }
 
-    .price-ribbon {
-      position: absolute;
-      top: -13px;
-      right: 16px;
-      background: #dc2626;
+    .tier-price {
+      font-size: 32px;
+      font-weight: 900;
+      margin: 6px 0 14px;
       color: #ffffff;
+    }
+
+    .tier-price small {
+      font-size: 13px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .tier-free ul,
+    .tier-glass-inner ul {
+      margin: 0 0 22px;
+      padding-left: 18px;
+      font-size: 14px;
+      color: #e2e8f0;
+    }
+
+    .tier-free li,
+    .tier-glass-inner li {
+      margin-bottom: 8px;
+    }
+
+    .tier-glass-shell {
+      position: relative;
+      border-radius: 16px;
+      padding: 3px;
+      overflow: hidden;
+      animation: neonPulse 2.8s ease-in-out infinite;
+    }
+
+    .tier-glass-shell::before {
+      content: "";
+      position: absolute;
+      inset: -60%;
+      background: conic-gradient(from 0deg, #00f5ff, #ff00d4, #39ff14, #facc15, #00f5ff);
+      animation: neonSpin 3.4s linear infinite;
+    }
+
+    .tier-glass-inner {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      border-radius: 13px;
+      padding: 26px;
+      background: rgba(12, 18, 36, 0.62);
+      backdrop-filter: blur(24px) saturate(210%);
+      -webkit-backdrop-filter: blur(24px) saturate(210%);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .tier-ribbon {
+      display: inline-block;
+      align-self: flex-start;
+      background: linear-gradient(90deg, #ff00d4, #00f5ff);
+      color: #060913;
       font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
+      font-weight: 900;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       padding: 4px 10px;
       border-radius: 999px;
+      margin-bottom: 10px;
     }
 
-    .price-card h3 {
+    .tier-glass-inner h3 {
       margin: 0 0 6px;
       font-size: 20px;
-      color: #0f172a;
-    }
-
-    .price-amount {
-      font-size: clamp(26px, 4vw, 34px);
-      font-weight: 900;
-      color: #0f172a;
-      margin: 6px 0 4px;
-      word-break: break-all;
-    }
-
-    .price-sub {
-      font-size: 12px;
-      color: #64748b;
-      margin: 0 0 16px;
-    }
-
-    .price-card ul {
-      margin: 0 0 20px;
-      padding-left: 20px;
-      color: #334155;
-      flex: 1;
-    }
-
-    .price-card li {
-      margin-bottom: 7px;
-      font-size: 14px;
-    }
-
-    .btn-enterprise {
-      width: 100%;
-      text-align: center;
-      cursor: pointer;
-      background: linear-gradient(90deg, #eab308, #f97316);
-      border: 2px solid #b45309;
       color: #ffffff;
-      padding: 12px 16px;
-      border-radius: 6px;
-      font-size: 15px;
-      font-weight: 800;
-      transition: transform 0.15s ease;
+      text-shadow: 0 0 12px rgba(255, 0, 212, 0.8);
     }
 
-    .btn-enterprise:hover {
-      transform: scale(1.04) rotate(0.8deg);
+    .tier-glass-price {
+      font-size: clamp(24px, 4vw, 30px);
+      font-weight: 900;
+      margin: 6px 0 14px;
+      background: linear-gradient(90deg, #00f5ff, #f472b6, #facc15);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      word-break: break-word;
     }
 
-    .pricing-note {
-      text-align: center;
+    .tier-glass-price small {
+      display: block;
       font-size: 12px;
-      color: #64748b;
-      margin-top: 12px;
+      color: #cbd5e1;
+      -webkit-text-fill-color: #cbd5e1;
+      margin-top: 2px;
     }
 
-    @keyframes toastPopIn {
-      0% { opacity: 0; transform: translateY(30px) scale(0.92); }
-      60% { opacity: 1; transform: translateY(-4px) scale(1.02); }
-      75% { transform: translateX(-6px); }
-      88% { transform: translateX(5px); }
-      100% { opacity: 1; transform: translate(0, 0) scale(1); }
+    .btn-neon {
+      width: 100%;
+      padding: 13px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      color: #060913;
+      background: linear-gradient(90deg, #00f5ff, #39ff14, #ff00d4);
+      background-size: 200% 200%;
+      cursor: pointer;
+      animation: rainbowShift 3s ease infinite;
+      box-shadow: 0 0 20px rgba(0, 245, 255, 0.55);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
-    .toast-404 {
+    .btn-neon:hover {
+      transform: scale(1.04);
+      box-shadow: 0 0 32px rgba(255, 0, 212, 0.85);
+    }
+
+    .btn-free-ghost {
+      display: inline-block;
+      text-align: center;
+      padding: 11px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      color: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .btn-free-ghost:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    /* Fake 404 bottom-right toast */
+    .toast-stack {
       position: fixed;
-      right: 22px;
-      bottom: 22px;
+      right: 20px;
+      bottom: 20px;
       z-index: 9999;
-      display: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 340px;
+      width: calc(100vw - 40px);
+    }
+
+    .fake-404-toast {
+      display: flex;
       align-items: flex-start;
       gap: 12px;
-      max-width: 340px;
       background: #18181b;
-      color: #f4f4f5;
-      border: 2px solid #ef4444;
-      border-left: 6px solid #ef4444;
+      color: #fafafa;
+      border: 1px solid #ef4444;
+      border-left: 5px solid #dc2626;
       border-radius: 8px;
       padding: 14px 16px;
-      box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
-      font-size: 13px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+      animation: toastPopIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
     }
 
-    .toast-404.show {
-      display: flex;
-      animation: toastPopIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    .toast-icon {
+    .toast-x-icon {
       flex-shrink: 0;
       width: 24px;
       height: 24px;
       border-radius: 50%;
-      background: #ef4444;
+      background: #dc2626;
       color: #ffffff;
       font-weight: 900;
       font-size: 14px;
       display: flex;
       align-items: center;
       justify-content: center;
-      line-height: 1;
+      margin-top: 1px;
+    }
+
+    .toast-body {
+      flex: 1;
+      font-size: 13px;
+      line-height: 1.4;
     }
 
     .toast-body strong {
@@ -497,25 +659,10 @@
       line-height: 1;
       cursor: pointer;
       padding: 0 2px;
-      margin-left: auto;
     }
 
     .toast-close:hover {
       color: #ffffff;
-    }
-
-    footer {
-      max-width: 960px;
-      margin: 24px auto 48px;
-      padding: 0 20px;
-      font-size: 13px;
-      color: #64748b;
-      text-align: center;
-    }
-
-    footer a {
-      color: #334155;
-      font-weight: 600;
     }
   </style>
 </head>
@@ -592,54 +739,56 @@
       </div>
     </article>
 
-    <section class="pricing-section" aria-label="Pricing Tiers">
+    <section class="pricing-arena" aria-label="Totally Serious Pricing Tiers">
+      <div class="neon-orb orb-1" aria-hidden="true"></div>
+      <div class="neon-orb orb-2" aria-hidden="true"></div>
+      <div class="neon-orb orb-3" aria-hidden="true"></div>
+
       <div class="pricing-header">
-        <h2>Simple, Transparent Pricing</h2>
-        <p>Choose the plan that best aligns with your digital transformation journey.</p>
+        <h2>Flexible Pricing</h2>
+        <p>Choose the plan that best aligns with your synergistic GPU temperature.</p>
       </div>
 
       <div class="pricing-grid">
-        <div class="price-card">
-          <h3>Normal Human</h3>
-          <div class="price-amount">$0</div>
-          <p class="price-sub">Forever · Free &amp; Open Source</p>
-          <ul>
-            <li>The actual entire extension</li>
-            <li>Zero invasive permissions</li>
-            <li>20 languages &amp; adaptive rate-limit recovery</li>
-            <li>No subscriptions, no paywalls, no nonsense</li>
-          </ul>
-          <a class="btn btn-primary" style="text-align:center;" href="https://github.com/Vector-Badger/roblox-badge-deleter">Use It For Free</a>
+        <div class="tier-free">
+          <div>
+            <h3>Actual Extension</h3>
+            <div class="tier-price">$0 <small>/ forever</small></div>
+            <ul>
+              <li>100% free &amp; open-source</li>
+              <li>Zero invasive permissions</li>
+              <li>Actually deletes your badges</li>
+              <li>Doesn't melt your laptop fan</li>
+            </ul>
+          </div>
+          <a class="btn-free-ghost" href="https://github.com/Vector-Badger/roblox-badge-deleter">Use the Free Version</a>
         </div>
 
-        <div class="price-card enterprise">
-          <div class="price-ribbon">Most Compartmentalized</div>
-          <h3>Enterprise Synergy Ultra</h3>
-          <div class="price-amount">9999999999$</div>
-          <p class="price-sub">Billed whenever · Does literally nothing</p>
-          <ul>
-            <li>Extra bloat</li>
-            <li>Enterprise synergic streamlined low hanging fruit badge fetch and sanitization prior removal</li>
-            <li>I'm the capitalism incarnate</li>
-            <li>I made the fees (fees apply)</li>
-            <li>Bruh</li>
-          </ul>
-          <button type="button" id="enterpriseBtn" class="btn-enterprise">Upgrade to 9999999999$</button>
+        <div class="tier-glass-shell">
+          <div class="tier-glass-inner">
+            <div>
+              <span class="tier-ribbon">Most Popular · Enterprise AI Glass</span>
+              <h3>Ultra Hyper-Synergy</h3>
+              <div class="tier-glass-price">
+                $9,999,999,999
+                <small>/ month (parody tier — does literally nothing)</small>
+              </div>
+              <ul>
+                <li>Extra bloat</li>
+                <li>Enterprise synergic streamlined low hanging fruit badge fetch and sanitization prior removal</li>
+                <li>I'm the capitalism incarnate</li>
+                <li>I made the fees (fees apply)</li>
+                <li>Bruh</li>
+              </ul>
+            </div>
+            <button type="button" class="btn-neon" id="enterpriseBtn">SUBSCRIBE NOW ($9,999,999,999)</button>
+          </div>
         </div>
       </div>
-
-      <p class="pricing-note">*Parody pricing tier for laughs only. Badge Deleter for Roblox is 100% free and open-source with zero paid plans.</p>
     </section>
   </main>
 
-  <div id="toast404" class="toast-404" role="alert" aria-live="polite">
-    <div class="toast-icon" aria-hidden="true">✕</div>
-    <div class="toast-body">
-      <strong>404 Not Found</strong>
-      <span>Billing microservice is too compartmentalized to process your 9999999999$.</span>
-    </div>
-    <button type="button" id="toastCloseBtn" class="toast-close" aria-label="Dismiss error">&times;</button>
-  </div>
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
 
   <footer>
     <p>&copy; 2026 Badger Dev · MIT License · <a href="./privacy.html">Privacy Policy</a></p>
@@ -649,28 +798,29 @@
   <script>
     (function () {
       const btn = document.getElementById('enterpriseBtn');
-      const toast = document.getElementById('toast404');
-      const closeBtn = document.getElementById('toastCloseBtn');
-      let hideTimer = null;
+      const stack = document.getElementById('toastStack');
+      if (!btn || !stack) return;
 
-      function hideToast() {
-        toast.classList.remove('show');
-        if (hideTimer) clearTimeout(hideTimer);
-      }
+      btn.addEventListener('click', function () {
+        const toast = document.createElement('div');
+        toast.className = 'fake-404-toast';
+        toast.innerHTML =
+          '<div class="toast-x-icon" aria-hidden="true">&#10005;</div>' +
+          '<div class="toast-body">' +
+            '<strong>404 Not Found</strong>' +
+            '<span>Enterprise checkout microservice could not be found (compartmentalized).</span>' +
+          '</div>' +
+          '<button type="button" class="toast-close" aria-label="Dismiss">&times;</button>';
 
-      if (btn && toast) {
-        btn.addEventListener('click', function () {
-          toast.classList.remove('show');
-          void toast.offsetWidth;
-          toast.classList.add('show');
-          if (hideTimer) clearTimeout(hideTimer);
-          hideTimer = setTimeout(hideToast, 4500);
+        toast.querySelector('.toast-close').addEventListener('click', function () {
+          toast.remove();
         });
-      }
 
-      if (closeBtn) {
-        closeBtn.addEventListener('click', hideToast);
-      }
+        stack.appendChild(toast);
+        setTimeout(function () {
+          if (toast.parentNode) toast.remove();
+        }, 5000);
+      });
     })();
   </script>
 </body>
