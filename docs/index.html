@@ -835,9 +835,9 @@
 
     .testimony-orbit-wrap {
       position: relative;
-      max-width: 660px;
+      max-width: 880px;
       margin: 0 auto;
-      padding: 18px 16px;
+      padding: 22px 18px;
     }
 
     .aurora-corner-clouds {
@@ -940,102 +940,95 @@
       right: 22px;
     }
 
+    .testimony-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+      text-align: left;
+    }
+
     .testimony-quote {
       position: relative;
       z-index: 2;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto;
-      padding: 28px 32px 20px;
-      border-radius: 22px;
+      justify-content: space-between;
+      margin: 0;
+      padding: 22px 24px 18px;
+      border-radius: 20px;
       background: rgba(12, 20, 44, 0.52);
-      border: 1px solid rgba(255, 255, 255, 0.34);
+      border: 1px solid rgba(255, 255, 255, 0.32);
       backdrop-filter: blur(36px) saturate(240%);
       -webkit-backdrop-filter: blur(36px) saturate(240%);
       box-shadow: 0 18px 46px rgba(2, 8, 28, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.45);
-      font-size: 17px;
+      font-size: 14.5px;
+      line-height: 1.55;
       font-style: italic;
       color: #f8fafc;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease;
     }
 
-    .tiny-help {
-      display: block;
-      margin-top: 10px;
-      font-size: 10px;
-      font-style: normal;
-      letter-spacing: 0.04em;
-      color: rgba(203, 213, 225, 0.65);
-    }
-
-    .ai-reviews-grid {
-      position: relative;
-      z-index: 2;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 18px;
-      margin-top: 26px;
-      text-align: left;
-    }
-
-    .ai-review-card {
-      padding: 20px;
-      border-radius: 18px;
-      background: rgba(15, 23, 42, 0.46);
-      border: 1px solid rgba(255, 255, 255, 0.24);
-      backdrop-filter: blur(28px) saturate(210%);
-      -webkit-backdrop-filter: blur(28px) saturate(210%);
-      box-shadow: 0 12px 32px rgba(2, 8, 28, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.28);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      transition: transform 0.2s ease, border-color 0.25s ease;
-    }
-
-    .ai-review-card:hover {
+    .testimony-quote:hover {
       transform: translateY(-4px);
-      border-color: rgba(125, 211, 252, 0.6);
+      border-color: rgba(186, 230, 253, 0.8);
+      box-shadow: 0 22px 56px rgba(14, 165, 233, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.72);
     }
 
-    .ai-review-header {
+    .testimony-divider {
+      border: none;
+      border-top: 1px dashed rgba(255, 255, 255, 0.3);
+      margin: 16px 0 12px;
+      width: 100%;
+    }
+
+    .customer-row {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px dashed rgba(148, 163, 184, 0.35);
+      font-style: normal;
     }
 
-    .default-two-ball-avatar {
+    .default-avatar {
       flex-shrink: 0;
-      width: 44px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
-      background: rgba(30, 41, 59, 0.85);
-      border: 1px solid rgba(203, 213, 225, 0.45);
+      background: rgba(148, 163, 184, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.38);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
     }
 
-    .ai-reviewer-meta strong {
+    .default-avatar svg {
+      width: 26px;
+      height: 26px;
+      fill: #cbd5e1;
+    }
+
+    .customer-meta strong {
       display: block;
       font-size: 14px;
       color: #ffffff;
+      line-height: 1.25;
     }
 
-    .ai-reviewer-meta span {
+    .customer-meta span {
       display: block;
-      font-size: 11px;
+      font-size: 12px;
       color: #94a3b8;
     }
 
-    .ai-review-text {
-      margin: 0;
-      font-size: 13.5px;
-      line-height: 1.5;
-      color: #e2e8f0;
+    .tiny-help {
+      display: block;
+      margin-top: 3px;
+      font-size: 10px;
+      font-style: normal;
+      letter-spacing: 0.04em;
+      color: rgba(203, 213, 225, 0.6);
     }
 
     /* Fake 404 bottom-right toast */
@@ -1252,70 +1245,73 @@
             <span class="corner-cloud cc-magnet"></span>
           </div>
           <span class="quote-orb q-open" aria-hidden="true">&ldquo;</span>
-          <blockquote class="testimony-quote">
-            "99999999999 plan buyer: Yea i got paid, so i'll say it works!"
-            <span class="tiny-help">(uhhh help)</span>
-          </blockquote>
+          <div class="testimony-grid">
+            <blockquote class="testimony-quote">
+              <div>"Yea i got paid, so i'll say it works!"</div>
+              <div>
+                <hr class="testimony-divider">
+                <div class="customer-row">
+                  <div class="default-avatar" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.2"/><path d="M4 20.5c0-4.2 3.6-7.2 8-7.2s8 3 8 7.2"/></svg>
+                  </div>
+                  <div class="customer-meta">
+                    <strong>John Doe</strong>
+                    <span>99999999999 plan buyer</span>
+                    <em class="tiny-help">(uhhh help)</em>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+
+            <blockquote class="testimony-quote">
+              <div>"My life changed from the free to the free from my badge roblox bed from how powerful the AWESOME plan is! now i can finally sleep on the floor in peace every night, thanks to badger dev, I definitely recommend the experience 10/10!"</div>
+              <div>
+                <hr class="testimony-divider">
+                <div class="customer-row">
+                  <div class="default-avatar" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.2"/><path d="M4 20.5c0-4.2 3.6-7.2 8-7.2s8 3 8 7.2"/></svg>
+                  </div>
+                  <div class="customer-meta">
+                    <strong>Hugh Mann</strong>
+                    <span>Former Bed Owner · Awesome Tier</span>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+
+            <blockquote class="testimony-quote">
+              <div>"In today's fast-paced digital landscape, Badger Dev doesn't merely delete badges—it delves into a rich, multifaceted tapestry of inventory synergy. Moreover, leveraging the Awesome tier fostered a seamless paradigm shift."</div>
+              <div>
+                <hr class="testimony-divider">
+                <div class="customer-row">
+                  <div class="default-avatar" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.2"/><path d="M4 20.5c0-4.2 3.6-7.2 8-7.2s8 3 8 7.2"/></svg>
+                  </div>
+                  <div class="customer-meta">
+                    <strong>Jane Placeholder</strong>
+                    <span>VP of Holistic Synergy, Company LLC</span>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+
+            <blockquote class="testimony-quote">
+              <div>"Certainly! Here is a natural, authentic-sounding 5-star customer testimonial: As a 100% real biological human with ten normal fingers, this extension unlocked scalable KPI alignment across my badge ecosystem."</div>
+              <div>
+                <hr class="testimony-divider">
+                <div class="customer-row">
+                  <div class="default-avatar" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.2"/><path d="M4 20.5c0-4.2 3.6-7.2 8-7.2s8 3 8 7.2"/></svg>
+                  </div>
+                  <div class="customer-meta">
+                    <strong>Firstname Lastname</strong>
+                    <span>Verified Human Customer #004</span>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+          </div>
           <span class="quote-orb q-close" aria-hidden="true">&rdquo;</span>
-        </div>
-
-        <div class="ai-reviews-grid">
-          <article class="ai-review-card">
-            <div class="ai-review-header">
-              <div class="default-two-ball-avatar" aria-hidden="true">
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                  <circle cx="18" cy="11" r="6" fill="#cbd5e1"/>
-                  <line x1="6" y1="19.5" x2="30" y2="19.5" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
-                  <circle cx="18" cy="30" r="9" fill="#cbd5e1"/>
-                </svg>
-              </div>
-              <div class="ai-reviewer-meta">
-                <strong>John Doe</strong>
-                <span>Verified Real Human #001</span>
-              </div>
-            </div>
-            <p class="ai-review-text">
-              "In today's fast-paced digital landscape, Badge Deleter delves into a rich tapestry of inventory optimization. Moreover, it serves as a testament to synergy &mdash; not merely removing badges, but fostering a holistic paradigm shift."
-            </p>
-          </article>
-
-          <article class="ai-review-card">
-            <div class="ai-review-header">
-              <div class="default-two-ball-avatar" aria-hidden="true">
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                  <circle cx="18" cy="11" r="6" fill="#cbd5e1"/>
-                  <line x1="6" y1="19.5" x2="30" y2="19.5" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
-                  <circle cx="18" cy="30" r="9" fill="#cbd5e1"/>
-                </svg>
-              </div>
-              <div class="ai-reviewer-meta">
-                <strong>Bob Fakename</strong>
-                <span>Upgraded from Free to Paid</span>
-              </div>
-            </div>
-            <p class="ai-review-text">
-              "My life changed from the free to the free from my badge roblox bed, now i can finally sleep on the floor in peace every night!"
-            </p>
-          </article>
-
-          <article class="ai-review-card">
-            <div class="ai-review-header">
-              <div class="default-two-ball-avatar" aria-hidden="true">
-                <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-                  <circle cx="18" cy="11" r="6" fill="#cbd5e1"/>
-                  <line x1="6" y1="19.5" x2="30" y2="19.5" stroke="#64748b" stroke-width="1.5" stroke-dasharray="3 2"/>
-                  <circle cx="18" cy="30" r="9" fill="#cbd5e1"/>
-                </svg>
-              </div>
-              <div class="ai-reviewer-meta">
-                <strong>Jane Customer_v2_FINAL</strong>
-                <span>Chief Officer at [INSERT_COMPANY]</span>
-              </div>
-            </div>
-            <p class="ai-review-text">
-              "Certainly! Here is a natural, human-sounding 5-star review: I was skeptical at first &mdash; however, paying 9,999,999,999 hourly elevated my workflow! Let me know if you would like a more casual tone."
-            </p>
-          </article>
         </div>
       </div>
     </section>
