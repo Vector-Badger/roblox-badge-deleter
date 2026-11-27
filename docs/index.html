@@ -817,80 +817,109 @@
       letter-spacing: -0.01em;
     }
 
-    @keyframes orbitSpinSlow {
-      0% { transform: translate(-50%, -50%) rotate(0deg); }
-      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    @keyframes cornerCloudLoopA {
+      0%   { top: -18px; left: -14px; transform: scale(1); }
+      25%  { top: -18px; left: calc(100% - 110px); transform: scale(1.18); }
+      50%  { top: calc(100% - 70px); left: calc(100% - 110px); transform: scale(0.95); }
+      75%  { top: calc(100% - 70px); left: -14px; transform: scale(1.14); }
+      100% { top: -18px; left: -14px; transform: scale(1); }
     }
 
-    @keyframes counterSpinSlow {
-      0% { transform: rotate(0deg) scale(1); }
-      50% { transform: rotate(-180deg) scale(1.12); }
-      100% { transform: rotate(-360deg) scale(1); }
+    @keyframes cornerCloudLoopB {
+      0%   { top: calc(100% - 70px); left: calc(100% - 110px); transform: scale(1.1); }
+      25%  { top: calc(100% - 70px); left: -14px; transform: scale(0.92); }
+      50%  { top: -18px; left: -14px; transform: scale(1.2); }
+      75%  { top: -18px; left: calc(100% - 110px); transform: scale(0.98); }
+      100% { top: calc(100% - 70px); left: calc(100% - 110px); transform: scale(1.1); }
     }
 
     .testimony-orbit-wrap {
       position: relative;
       max-width: 660px;
       margin: 0 auto;
-      padding: 26px 22px;
+      padding: 18px 16px;
     }
 
-    .cloudy-synergy-ring {
+    .aurora-corner-clouds {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 104%;
-      height: 138%;
-      border-radius: 50%;
-      border: 1px dashed rgba(186, 230, 253, 0.38);
-      box-shadow: 0 0 40px rgba(56, 189, 248, 0.22), inset 0 0 36px rgba(147, 197, 253, 0.16);
+      inset: 6px;
+      border-radius: 24px;
+      z-index: 1;
       pointer-events: none;
-      animation: orbitSpinSlow 14s linear infinite;
+    }
+
+    .corner-cloud {
+      position: absolute;
+      width: 130px;
+      height: 86px;
+      border-radius: 50%;
+      filter: blur(26px);
+      opacity: 0.88;
+      mix-blend-mode: screen;
+    }
+
+    .corner-cloud.cc-cyan {
+      background: radial-gradient(circle, #38bdf8 0%, #6366f1 65%, transparent 100%);
+      animation: cornerCloudLoopA 9s ease-in-out infinite;
+    }
+
+    .corner-cloud.cc-magenta {
+      background: radial-gradient(circle, #e879f9 0%, #3b82f6 65%, transparent 100%);
+      animation: cornerCloudLoopB 9s ease-in-out infinite;
+    }
+
+    .corner-cloud.cc-emerald {
+      background: radial-gradient(circle, #2dd4bf 0%, #0ea5e9 70%, transparent 100%);
+      animation: cornerCloudLoopA 13s ease-in-out -4.5s infinite reverse;
     }
 
     .quote-orb {
       position: absolute;
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
+      z-index: 3;
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 42px;
+      font-size: 38px;
       font-weight: 900;
       line-height: 1;
       color: #e0f2fe;
-      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.34), rgba(56, 189, 248, 0.14) 65%, rgba(15, 23, 42, 0.25));
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(56, 189, 248, 0.12));
       border: 1px solid rgba(255, 255, 255, 0.48);
       backdrop-filter: blur(24px) saturate(240%);
       -webkit-backdrop-filter: blur(24px) saturate(240%);
-      box-shadow: 0 8px 28px rgba(14, 165, 233, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.65);
-      text-shadow: 0 0 16px rgba(125, 211, 252, 0.9);
-      animation: counterSpinSlow 14s linear infinite;
+      box-shadow: 0 8px 24px rgba(2, 8, 28, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.65);
+      text-shadow: 0 0 14px rgba(125, 211, 252, 0.85);
     }
 
     .quote-orb.q-open {
-      top: -22px;
-      left: 12%;
+      top: 0;
+      left: 22px;
     }
 
     .quote-orb.q-close {
-      bottom: -22px;
-      right: 12%;
+      bottom: 0;
+      right: 22px;
     }
 
     .testimony-quote {
       position: relative;
       z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       margin: 0 auto;
-      padding: 24px 28px 18px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(56, 189, 248, 0.08));
-      border: 1px solid rgba(255, 255, 255, 0.36);
-      backdrop-filter: blur(34px) saturate(230%);
-      -webkit-backdrop-filter: blur(34px) saturate(230%);
-      box-shadow: 0 18px 46px rgba(2, 8, 28, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      padding: 28px 32px 20px;
+      border-radius: 22px;
+      background: rgba(12, 20, 44, 0.52);
+      border: 1px solid rgba(255, 255, 255, 0.34);
+      backdrop-filter: blur(36px) saturate(240%);
+      -webkit-backdrop-filter: blur(36px) saturate(240%);
+      box-shadow: 0 18px 46px rgba(2, 8, 28, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.45);
       font-size: 17px;
       font-style: italic;
       color: #f8fafc;
@@ -1112,14 +1141,17 @@
       <div class="testimony-section">
         <h3>What our customers <em>say</em>:</h3>
         <div class="testimony-orbit-wrap">
-          <div class="cloudy-synergy-ring" aria-hidden="true">
-            <span class="quote-orb q-open">&ldquo;</span>
-            <span class="quote-orb q-close">&rdquo;</span>
+          <div class="aurora-corner-clouds" aria-hidden="true">
+            <span class="corner-cloud cc-cyan"></span>
+            <span class="corner-cloud cc-magenta"></span>
+            <span class="corner-cloud cc-emerald"></span>
           </div>
+          <span class="quote-orb q-open" aria-hidden="true">&ldquo;</span>
           <blockquote class="testimony-quote">
             "99999999999 plan buyer: Yea i got paid, so i'll say it works!"
             <span class="tiny-help">(uhhh help)</span>
           </blockquote>
+          <span class="quote-orb q-close" aria-hidden="true">&rdquo;</span>
         </div>
       </div>
     </section>
@@ -1145,7 +1177,7 @@
 
       const glyphs = [];
       const GLYPH_COUNT = 110;
-      const CHARS = ['$', '9', '4', '$', '9'];
+      const CHARS = ['$', '9', '0', '$', '9'];
 
       function resizeCanvas() {
         if (!canvas) return;
