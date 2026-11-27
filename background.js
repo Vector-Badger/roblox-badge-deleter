@@ -177,10 +177,18 @@ async function deleteBadge(badgeId) {
 }
 
 async function getUserId() {
-  const response = await fetch('https://users.roblox.com/v1/users/authenticated', {
+  const response = await fetchWithTimeout('https://users.roblox.com/v1/users/authenticated', {
     credentials: 'include'
   });
-  if (!response.ok) throw new Error("Not logged in to Roblox.");
+  if (!response.ok) {
+    const err = new Error(
+      response.status === 401
+        ? 'Not logged in to Roblox.'
+        : `HTTP Error ${response.status} verifying Roblox session.`
+    );
+    err.status = response.status;
+    throw err;
+  }
   const data = await response.json();
   return data.id;
 }
@@ -195,8 +203,12 @@ async function fetchAllBadges() {
       let url = `https://badges.roblox.com/v1/users/${encodeURIComponent(userId)}/badges?limit=100&sortOrder=Desc`;
       if (cursor) url += `&cursor=${encodeURIComponent(cursor)}`;
       
-      const response = await fetch(url, { credentials: 'include' });
-      if (!response.ok) throw new Error(`HTTP Error ${response.status} fetching badges`);
+      const response = await fetchWithTimeout(url, { credentials: 'include' });
+      if (!response.ok) {
+        const err = new Error(`HTTP Error ${response.status} fetching badges`);
+        err.status = response.status;
+        throw err;
+      }
       
       const data = await response.json();
       if (data.data) {
@@ -205,9 +217,17 @@ async function fetchAllBadges() {
       cursor = data.nextPageCursor;
     } while (cursor);
     
+    trackAnalyticsEvent('inventory_loaded', { badge_count: allBadges.length });
     return { success: true, badges: allBadges };
   } catch (error) {
-    return { success: false, error: error.message };
+    const errMsg = (error && error.message) ? error.message : 'Unknown inventory error';
+    const errStatus = (error && error.status) || 0;
+    trackAnalyticsEvent('inventory_load_failed', {
+      error_reason: classifyErrorReason(errMsg, errStatus),
+      error_status: errStatus,
+      error_detail: sanitizeErrorDetail(errMsg)
+    });
+    return { success: false, error: errMsg };
   }
 }
 
@@ -245,6 +265,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           saved.isRunning = false;
           saved.lastError = saved.lastError || 'Background worker was interrupted before finishing.';
           persistDeletionState(saved);
+          trackAnalyticsEvent('badge_worker_interrupted', {
+            deleted_count: saved.deleted || 0,
+            failed_count: saved.failed || 0,
+            total_items: saved.total || 0
+          });
         }
         deletionState = saved;
       }
@@ -291,6 +316,7 @@ async function runMassDeletion(badgesToProcess) {
     const COOLDOWNS_MS = [60000, 60000, 90000, 120000, 120000, 150000, 180000, 180000, 180000, 180000, 180000, 180000];
     let successCount = 0;
     let failCount = 0;
+    let lastFailureStatus = 0;
     let pacingDelayMs = START_STAGGER_MS;
     let throttledOnce = false;
     let cleanStreak = 0;
@@ -312,9 +338,10 @@ async function runMassDeletion(badgesToProcess) {
       persistDeletionState(deletionState);
     }
 
-    function recordFailed(badgeId, errorMsg) {
+    function recordFailed(badgeId, errorMsg, status = 0) {
       console.warn(`Failed deleting badge ${badgeId} after cooldown recovery:`, errorMsg);
       deletionState.lastError = errorMsg;
+      lastFailureStatus = status || 0;
       failCount++;
       deletionState.failed = failCount;
       persistDeletionState(deletionState);
@@ -369,7 +396,7 @@ async function runMassDeletion(badgesToProcess) {
           if (allowGlitchDefer) {
             glitchRetryQueue.push({ badgeId, lastError: res.error });
           } else {
-            recordFailed(badgeId, res.error);
+            recordFailed(badgeId, res.error, res.status);
           }
           return false;
         }
@@ -387,7 +414,7 @@ async function runMassDeletion(badgesToProcess) {
         }
 
         if (stalledRetries >= COOLDOWNS_MS.length) {
-          recordFailed(badgeId, formatAttemptError(res.status, res.error));
+          recordFailed(badgeId, formatAttemptError(res.status, res.error), res.status);
           return false;
         }
 
@@ -431,14 +458,47 @@ async function runMassDeletion(badgesToProcess) {
       setToolbarBadge('!', '#F68888');
     }
 
-    if (successCount > 0 || failCount > 0) {
-      trackAnalyticsEvent('mass_deletion_complete', { count: successCount, failed: failCount });
+    if (successCount > 0 && failCount === 0) {
+      trackAnalyticsEvent('deletion_full_clear', {
+        deleted_count: successCount,
+        total_items: badgesToProcess.length,
+        throttled_once: throttledOnce ? 1 : 0
+      });
+    } else if (failCount > 0) {
+      const outcomeEvent = successCount > 0 ? 'deletion_partial_fail' : 'deletion_total_fail';
+      trackAnalyticsEvent(outcomeEvent, {
+        deleted_count: successCount,
+        failed_count: failCount,
+        total_items: badgesToProcess.length,
+        error_reason: classifyErrorReason(deletionState.lastError, lastFailureStatus),
+        error_status: lastFailureStatus,
+        error_detail: sanitizeErrorDetail(deletionState.lastError)
+      });
     }
     return { status: 'completed', deleted: successCount, failed: failCount, lastError: deletionState.lastError };
+  } catch (fatalErr) {
+    const errMsg = (fatalErr && fatalErr.message) ? fatalErr.message : 'Unexpected deletion failure';
+    const errStatus = (fatalErr && fatalErr.status) || 0;
+    deletionState.statusMessage = null;
+    deletionState.lastError = errMsg;
+    deletionState.isRunning = false;
+    setToolbarBadge('!', '#F68888');
+    await persistDeletionState(deletionState);
+    trackAnalyticsEvent('deletion_crashed', {
+      deleted_count: deletionState.deleted || 0,
+      failed_count: deletionState.failed || 0,
+      total_items: badgesToProcess.length,
+      error_reason: classifyErrorReason(errMsg, errStatus),
+      error_status: errStatus,
+      error_detail: sanitizeErrorDetail(errMsg)
+    });
+    throw fatalErr;
   } finally {
     deletionState.isRunning = false;
   }
 }
+
+let analyticsIdentity = null;
 
 function getDeletionState() {
   return deletionState;
@@ -447,6 +507,7 @@ function getDeletionState() {
 function resetState() {
   cachedCsrfToken = null;
   csrfPromise = null;
+  analyticsIdentity = null;
   deletionState = {
     isRunning: false,
     total: 0,
@@ -457,25 +518,177 @@ function resetState() {
   };
 }
 
-function trackAnalyticsEvent(eventName, params) {
-  // Measurement Protocol for GA4
-  // TODO: Replace with your actual Measurement ID and API Secret
-  const measurement_id = 'G-JKKP6G713X'; 
-  const api_secret = '9W7muFwuReyr9HcMo-GI8A'; 
-  
-  // If not configured, just return silently
-  if (measurement_id === 'G-XXXXXXXXXX') return;
+const GA_MEASUREMENT_ID = 'G-JKKP6G713X';
+const GA_API_SECRET = '9W7muFwuReyr9HcMo-GI8A';
+const ANALYTICS_CACHE_KEY = 'https://local.state/analytics';
+const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+const RESERVED_GA_EVENTS = new Set([
+  'error', 'first_visit', 'first_open', 'session_start', 'user_engagement', 'app_remove', 'app_update'
+]);
 
-  fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${measurement_id}&api_secret=${api_secret}`, {
-    method: "POST",
-    body: JSON.stringify({
-      client_id: 'extension_user_background', 
-      events: [{
-        name: eventName,
-        params: params
-      }]
-    })
-  }).catch(e => console.error("GA Error", e));
+/** Returns false on Firefox so AMO data_collection_permissions=['none'] stays strictly honored. */
+function isTelemetryAllowed() {
+  try {
+    if (typeof browser !== 'undefined' && browser.runtime && typeof browser.runtime.getBrowserInfo === 'function') {
+      return false;
+    }
+    if (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.getURL === 'function') {
+      const origin = chrome.runtime.getURL('');
+      if (origin && origin.startsWith('moz-extension://')) return false;
+    }
+    if (typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.includes('Firefox/')) {
+      return false;
+    }
+  } catch (e) {}
+  return Boolean(GA_MEASUREMENT_ID && GA_MEASUREMENT_ID !== 'G-XXXXXXXXXX' && GA_API_SECRET);
+}
+
+function generateAnonymousId() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.floor(Math.random() * 16);
+    const v = c === 'x' ? r : ((r & 0x3) | 0x8);
+    return v.toString(16);
+  });
+}
+
+async function getAnalyticsIdentity() {
+  const now = Date.now();
+  if (!analyticsIdentity && typeof caches !== 'undefined' && caches.open) {
+    try {
+      const cache = await caches.open('badge-deleter-state-v1');
+      const res = await cache.match(ANALYTICS_CACHE_KEY);
+      if (res) {
+        const saved = await res.json();
+        if (saved && saved.clientId) analyticsIdentity = saved;
+      }
+    } catch (e) {}
+  }
+
+  if (!analyticsIdentity) {
+    analyticsIdentity = {
+      clientId: generateAnonymousId(),
+      sessionId: String(Math.floor(now / 1000)),
+      lastEventAt: now
+    };
+  } else {
+    if (!analyticsIdentity.sessionId || (now - (analyticsIdentity.lastEventAt || 0)) > SESSION_TIMEOUT_MS) {
+      analyticsIdentity.sessionId = String(Math.floor(now / 1000));
+    }
+    analyticsIdentity.lastEventAt = now;
+  }
+
+  if (typeof caches !== 'undefined' && caches.open) {
+    try {
+      const cache = await caches.open('badge-deleter-state-v1');
+      await cache.put(ANALYTICS_CACHE_KEY, new Response(JSON.stringify(analyticsIdentity)));
+    } catch (e) {}
+  }
+  return analyticsIdentity;
+}
+
+function getExtensionVersion() {
+  try {
+    if (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.getManifest === 'function') {
+      const manifest = chrome.runtime.getManifest();
+      if (manifest && manifest.version) return String(manifest.version);
+    }
+  } catch (e) {}
+  return 'unknown';
+}
+
+function getUiLocale() {
+  try {
+    if (typeof chrome !== 'undefined' && chrome.i18n && typeof chrome.i18n.getUILanguage === 'function') {
+      return chrome.i18n.getUILanguage() || '';
+    }
+  } catch (e) {}
+  return '';
+}
+
+/** Maps verbose runtime/API errors into bounded categorical buckets for analytics grouping. */
+function classifyErrorReason(errorMessage, status = 0) {
+  const msg = String(errorMessage || '').toLowerCase();
+  if (status === 401 || msg.includes('not logged in')) return 'not_logged_in';
+  if (msg.includes('csrf')) return 'csrf_extract_failed';
+  if (status === 429 || msg.includes('rate limit')) return 'rate_limited';
+  if (status === 403 || msg.includes('waf') || msg.includes('forbidden')) return 'forbidden_waf';
+  if (status === 408 || msg.includes('abort') || msg.includes('timeout') || msg.includes('timed out')) return 'timeout';
+  if (status >= 500 || msg.includes('internal server')) return 'server_error';
+  if (msg.includes('failed to fetch') || msg.includes('network')) return 'network_error';
+  if (msg.includes('receiving end') || msg.includes('site access') || msg.includes('interrupted')) return 'extension_runtime_error';
+  if (status >= 400) return `http_${status}`;
+  return 'unknown_error';
+}
+
+/** Strips numeric IDs and extension hashes, enforcing GA4's 100-char parameter limit. */
+function sanitizeErrorDetail(rawText) {
+  if (!rawText) return '';
+  return String(rawText)
+    .replace(/\/users\/\d+/g, '/users/[id]')
+    .replace(/\/badges\/\d+/g, '/badges/[id]')
+    .replace(/(?:chrome|moz)-extension:\/\/[^/\s]+/g, 'ext://[self]')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 95);
+}
+
+function sanitizeAnalyticsParams(params) {
+  const clean = {};
+  if (!params || typeof params !== 'object') return clean;
+  let count = 0;
+  for (const [key, val] of Object.entries(params)) {
+    if (count >= 25) break;
+    if (!key || key.length > 40) continue;
+    if (/^(_|ga_|google_|gtag_|firebase_)/.test(key)) continue;
+    if (val === null || val === undefined || val === '') continue;
+    if (typeof val === 'number') {
+      if (!Number.isFinite(val)) continue;
+      clean[key] = val;
+    } else if (typeof val === 'boolean') {
+      clean[key] = val ? 1 : 0;
+    } else {
+      const normalized = key === 'error_detail' ? sanitizeErrorDetail(val) : String(val);
+      clean[key] = normalized.slice(0, 95);
+    }
+    count++;
+  }
+  return clean;
+}
+
+async function trackAnalyticsEvent(eventName, params = {}) {
+  try {
+    if (!eventName || typeof eventName !== 'string' || eventName.length > 40) return;
+    if (RESERVED_GA_EVENTS.has(eventName) || /^(_|ga_|google_|gtag_|firebase_)/.test(eventName)) return;
+    if (!isTelemetryAllowed()) return;
+
+    const identity = await getAnalyticsIdentity();
+    const locale = getUiLocale();
+    const mergedParams = sanitizeAnalyticsParams({
+      ...params,
+      session_id: identity.sessionId,
+      engagement_time_msec: (params && Number.isFinite(params.engagement_time_msec) && params.engagement_time_msec > 0)
+        ? Math.round(params.engagement_time_msec)
+        : 100,
+      ext_version: getExtensionVersion(),
+      ...(locale ? { ui_locale: locale } : {})
+    });
+
+    await fetch(`https://www.google-analytics.com/mp/collect?measurement_id=${GA_MEASUREMENT_ID}&api_secret=${GA_API_SECRET}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        client_id: identity.clientId,
+        events: [{
+          name: eventName,
+          params: mergedParams
+        }]
+      })
+    });
+  } catch (e) {
+    // Telemetry errors must remain non-fatal to background operations.
+  }
 }
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -489,6 +702,10 @@ if (typeof module !== 'undefined' && module.exports) {
     getDeletionState,
     resetState,
     persistDeletionState,
-    loadPersistedDeletionState
+    loadPersistedDeletionState,
+    isTelemetryAllowed,
+    classifyErrorReason,
+    sanitizeErrorDetail,
+    getAnalyticsIdentity
   };
 }

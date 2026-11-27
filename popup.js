@@ -38,6 +38,42 @@ localizeUI();
 
 let selectedCount = 0;
 
+let reportedPopupCrash = false;
+
+function reportPopupAnalytics(eventName, params = {}) {
+  try {
+    if (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.sendMessage === 'function') {
+      chrome.runtime.sendMessage({ action: 'track_analytics', eventName, params }, () => {
+        // Read lastError to avoid unchecked runtime.lastError warnings when popup unloads.
+        void (chrome.runtime && chrome.runtime.lastError);
+      });
+    }
+  } catch (e) {}
+}
+
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('error', (event) => {
+    if (reportedPopupCrash) return;
+    reportedPopupCrash = true;
+    const msg = (event && event.message) ? event.message : 'Popup script error';
+    reportPopupAnalytics('popup_js_error', {
+      error_reason: 'popup_js_error',
+      error_detail: msg
+    });
+  });
+
+  window.addEventListener('unhandledrejection', (event) => {
+    if (reportedPopupCrash) return;
+    reportedPopupCrash = true;
+    const reason = event && event.reason;
+    const msg = (reason && reason.message) ? reason.message : String(reason || 'Unhandled popup rejection');
+    reportPopupAnalytics('popup_js_error', {
+      error_reason: 'popup_unhandled_rejection',
+      error_detail: msg
+    });
+  });
+}
+
 function setStatus(text, color = '#BDBEBE') {
   statusEl.textContent = text;
   statusEl.style.color = color;
@@ -104,6 +140,11 @@ loadBtn.addEventListener('click', () => {
     loadBtn.disabled = false;
     
     if (chrome.runtime.lastError) {
+      reportPopupAnalytics('popup_runtime_error', {
+        error_reason: 'extension_runtime_error',
+        error_detail: chrome.runtime.lastError.message,
+        phase: 'fetch_all_badges'
+      });
       setStatus('Error: ' + chrome.runtime.lastError.message, '#F68888');
       return;
     }
@@ -195,7 +236,7 @@ deleteBtn.addEventListener('click', () => {
 });
 
 cancelDeleteBtn.addEventListener('click', () => {
-  chrome.runtime.sendMessage({ action: 'track_analytics', eventName: 'deletion_cancelled', params: { items_cancelled: badgesToDeleteCache.length } });
+  reportPopupAnalytics('deletion_cancelled', { items_cancelled: badgesToDeleteCache.length });
   badgesToDeleteCache = [];
   stepConfirm.style.display = 'none';
   stepFilter.style.display = 'flex';
@@ -256,9 +297,16 @@ confirmDeleteBtn.addEventListener('click', () => {
   
   const badgeIds = toDelete.map(item => item.badge.id);
 
-  chrome.runtime.sendMessage({ action: 'track_analytics', eventName: 'deletion_started', params: { total_items: badgeIds.length } });
+  reportPopupAnalytics('deletion_started', { total_items: badgeIds.length });
   chrome.runtime.sendMessage({ action: 'start_mass_deletion', badgesToDelete: badgeIds }, (res) => {
-    if (chrome.runtime.lastError) return;
+    if (chrome.runtime.lastError) {
+      reportPopupAnalytics('popup_runtime_error', {
+        error_reason: 'extension_runtime_error',
+        error_detail: chrome.runtime.lastError.message,
+        phase: 'start_mass_deletion'
+      });
+      return;
+    }
     if (res && res.status === 'completed') {
       renderCompletionStatus(res.deleted, res.failed, res.lastError, 'Ensure site access is ON for *.roblox.com');
     }

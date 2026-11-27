@@ -311,7 +311,102 @@ async function testBackground() {
   assert.equal(serverErrRes.failed, 1);
   assert.equal(serverErrRes.lastError.includes('Internal Server Error'), true, '500 failure must preserve server error rather than reporting Rate Limited');
 
-  // Restore globals
+  // Test GA4 Key Event Telemetry, Anonymous Identity, Sanitization, and Firefox Block
+  bg.resetState();
+  clearFetchMocks();
+  const gaPayloads = [];
+  const gaUrl = 'https://www.google-analytics.com/mp/collect?measurement_id=G-JKKP6G713X&api_secret=9W7muFwuReyr9HcMo-GI8A';
+  setFetchMock(gaUrl, (options) => {
+    gaPayloads.push(JSON.parse(options.body));
+    return { ok: true, json: async () => ({}), headers: { get: () => null } };
+  });
+
+  const origGetManifest = global.chrome.runtime.getManifest;
+  const origGetURL = global.chrome.runtime.getURL;
+  const origGetUILanguage = global.chrome.i18n.getUILanguage;
+  global.chrome.runtime.getManifest = () => ({ version: '1.45.0' });
+  global.chrome.runtime.getURL = () => 'chrome-extension://abcdefghijklmnop/';
+  global.chrome.i18n.getUILanguage = () => 'en-US';
+  const flushTelemetry = () => new Promise(r => origSetTimeout(r, 5));
+
+  // Verify reserved GA4 event names are dropped
+  await bg.trackAnalyticsEvent('error', { bad: 1 });
+  assert.equal(gaPayloads.length, 0, 'Reserved GA4 event name "error" must never be dispatched');
+
+  // Verify anonymous client_id, session_id, PII stripping, and 95-char truncation
+  await bg.trackAnalyticsEvent('deletion_partial_fail', {
+    deleted_count: 5,
+    failed_count: 1,
+    error_detail: 'Failed at https://badges.roblox.com/v1/users/987654321/badges ' + 'x'.repeat(120)
+  });
+  assert.equal(gaPayloads.length, 1);
+  const firstEvent = gaPayloads[0];
+  assert.notEqual(firstEvent.client_id, 'extension_user_background', 'client_id must be unique per install');
+  assert.match(String(firstEvent.events[0].params.session_id), /^\d+$/, 'session_id must be positive digits');
+  assert.equal(firstEvent.events[0].params.engagement_time_msec >= 100, true);
+  assert.equal(firstEvent.events[0].params.ext_version, '1.45.0');
+  assert.equal(firstEvent.events[0].params.error_detail.includes('987654321'), false, 'Numeric Roblox userId must be scrubbed');
+  assert.equal(firstEvent.events[0].params.error_detail.includes('/users/[id]'), true);
+  assert.equal(firstEvent.events[0].params.error_detail.length <= 95, true, 'GA4 params must stay below 100-char ceiling');
+
+  // Verify persistent client_id survives SW memory resets via CacheStorage
+  bg.resetState();
+  await bg.trackAnalyticsEvent('deletion_started', { total_items: 1 });
+  assert.equal(gaPayloads.length, 2);
+  assert.equal(gaPayloads[1].client_id, firstEvent.client_id);
+
+  // Verify deletion_full_clear and deletion_total_fail outcome split
+  setFetchMock('https://auth.roblox.com/v2/logout', () => ({
+    headers: { get: (h) => h === 'x-csrf-token' ? 'mock-csrf-token' : null }
+  }));
+  setFetchMock('https://badges.roblox.com/v1/user/badges/601', () => ({ ok: true }));
+  await bg.runMassDeletion([601]);
+  await flushTelemetry();
+  assert.equal(gaPayloads.some(p => p.events[0].name === 'deletion_full_clear' && p.events[0].params.deleted_count === 1), true);
+
+  setFetchMock('https://badges.roblox.com/v1/user/badges/602', () => ({
+    ok: false,
+    status: 401,
+    json: async () => ({ errors: [{ message: 'Authorization has been denied' }] })
+  }));
+  await bg.runMassDeletion([602]);
+  await flushTelemetry();
+  const totalFailEvt = gaPayloads.find(p => p.events[0].name === 'deletion_total_fail');
+  assert.equal(Boolean(totalFailEvt), true, 'Zero-success deletion must emit deletion_total_fail');
+  assert.equal(totalFailEvt.events[0].params.error_reason, 'not_logged_in');
+  assert.equal(totalFailEvt.events[0].params.error_status, 401);
+
+  // Verify inventory_load_failed telemetry on auth failure
+  setFetchMock('https://users.roblox.com/v1/users/authenticated', () => ({ ok: false, status: 401 }));
+  const invFail = await bg.fetchAllBadges();
+  await flushTelemetry();
+  assert.equal(invFail.success, false);
+  const invFailEvt = gaPayloads.find(p => p.events[0].name === 'inventory_load_failed');
+  assert.equal(Boolean(invFailEvt), true);
+  assert.equal(invFailEvt.events[0].params.error_reason, 'not_logged_in');
+  assert.equal(invFailEvt.events[0].params.error_status, 401);
+
+  // Verify badge_worker_interrupted telemetry on orphaned SW recovery
+  await bg.persistDeletionState({ isRunning: true, total: 50, deleted: 12, failed: 0, lastError: null });
+  bg.resetState();
+  await new Promise(resolve => messageHandler({ action: 'get_deletion_status' }, {}, resolve));
+  await flushTelemetry();
+  const interruptedEvt = gaPayloads.find(p => p.events[0].name === 'badge_worker_interrupted');
+  assert.equal(Boolean(interruptedEvt), true);
+  assert.equal(interruptedEvt.events[0].params.deleted_count, 12);
+  assert.equal(interruptedEvt.events[0].params.total_items, 50);
+
+  // Verify Firefox telemetry suppression (zero external pings under moz-extension://)
+  const countBeforeFirefox = gaPayloads.length;
+  global.chrome.runtime.getURL = () => 'moz-extension://firefox-uuid-test/';
+  assert.equal(bg.isTelemetryAllowed(), false);
+  await bg.trackAnalyticsEvent('deletion_full_clear', { deleted_count: 99 });
+  assert.equal(gaPayloads.length, countBeforeFirefox, 'Firefox build must send zero telemetry requests');
+
+  // Restore globals and runtime helpers
+  global.chrome.runtime.getManifest = origGetManifest;
+  global.chrome.runtime.getURL = origGetURL;
+  global.chrome.i18n.getUILanguage = origGetUILanguage;
   global.setTimeout = origSetTimeout;
   global.Date.now = origDateNow;
 
